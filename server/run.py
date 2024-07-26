@@ -7,7 +7,6 @@ servers = [
     "python queryserver.py",
     "python diseaseapp.py",
     "python patient_count.py",
-    "python patient_count_stack.py",
     "python app.py"
 ]
 
