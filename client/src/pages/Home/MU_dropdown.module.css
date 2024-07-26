@@ -1,0 +1,46 @@
+/* //theme buttons */
+.cont_th {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.col_buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.col_buttons button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 50ms ease;
+}
+
+.col_buttons button:hover {
+    scale: 1.2;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* *** dropdown css */
+.profileDivStyle {
+    background-color: var(--secondary-color-background);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    color: var(--secondary-color-text);
+    font-size: 18px;
+    transition: all ease 100ms;
+
+}
+
+.profileDivStyle:hover {
+    scale: 1.2;
+}

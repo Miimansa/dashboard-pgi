@@ -1,0 +1,49 @@
+.graphFilter {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    justify-content: center;
+    gap: 20px;
+    width: 80%;
+}
+
+.sectionoption {
+    display: flex;
+    width: 20%;
+    height: 2rem;
+    border-radius: 7px;
+}
+
+.sectionoption:hover {
+    cursor: pointer;
+}
+
+.sectionoption_item:hover {
+    cursor: pointer;
+}
+
+.sectionitem {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.save_button {
+    width: 100px;
+    padding: 5px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--primary-color-background);
+    color: var(--secondary-text-color);
+    transition: all ease 100ms;
+    font-weight: bold;
+}
+
+.save_button:hover {
+    scale: 1.2;
+}

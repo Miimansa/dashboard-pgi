@@ -1,0 +1,108 @@
+{
+  "home": {
+    "departmentWisePatientCount": {
+      "defaultType": "line",
+      "compatibleTypes": ["line", "bar", "scatter", "area", "groupedBar", "stackedBar"]
+    },
+    "visitsVsAdmissions": {
+      "defaultType": "groupedBar",
+      "compatibleTypes": ["groupedBar", "bar", "line", "scatter", "area", "stackedBar"]
+    },
+    "genderCount": {
+      "defaultType": "groupedBar",
+      "compatibleTypes": ["groupedBar", "bar", "line", "scatter", "area", "stackedBar"]
+    },
+    "departmentWisePatients": {
+      "defaultType": "pie",
+      "compatibleTypes": ["pie", "donut"]
+    },
+    "genderDistribution": {
+      "defaultType": "pie",
+      "compatibleTypes": ["pie", "donut"]
+    }
+  },
+  "labs": {
+    "LabOrderCount": {
+      "defaultType": "bar",
+      "compatibleTypes": ["bar", "line", "scatter", "area", "groupedBar", "stackedBar"]
+    },
+    "labOrdersByDepartment": {
+      "defaultType": "bar",
+      "compatibleTypes": ["bar", "groupedBar", "stackedBar", "line", "scatter", "area", "heatmap"]
+    },
+    "monthlyLabTestCounts": {
+      "defaultType": "line",
+      "compatibleTypes": ["line", "bar", "scatter", "area", "groupedBar", "stackedBar"]
+    },
+    "patientCountByDepartment": {
+      "defaultType": "pie",
+      "compatibleTypes": [ "pie", "donut"]
+    }
+  },
+  "disease": {
+    "diseaseCounts": {
+      "defaultType": "line",
+      "compatibleTypes": ["line", "bar", "scatter", "area", "groupedBar", "stackedBar"]
+    },
+    "deathTally": {
+      "defaultType": "line",
+      "compatibleTypes": ["line", "bar", "scatter", "area", "groupedBar", "stackedBar"]
+    },
+    "patientCountByDisease": {
+      "defaultType": "bar",
+      "compatibleTypes": ["bar", "groupedBar", "stackedBar", "line", "scatter", "area"]
+    },
+    "genderAgeDistribution": {
+      "defaultType": "pyramid",
+      "compatibleTypes": ["pyramid", "groupedBar", "stackedBar", "heatmap", "scatter"]
+    },
+    "totalSurvivalRate": {
+      "defaultType": "gauge",
+      "compatibleTypes": ["gauge", "pie", "donut"]
+    }
+  },
+  "emergency": {
+    "uniquePatientCounts": {
+      "defaultType": "line",
+      "compatibleTypes": ["line", "bar", "scatter", "area", "groupedBar", "stackedBar"]
+    },
+    "survivalDeathCounts": {
+      "defaultType": "groupedBar",
+      "compatibleTypes": ["groupedBar", "bar", "stackedBar", "line", "scatter", "area"]
+    },
+    "durationOfStay": {
+      "defaultType": "groupedBar",
+      "compatibleTypes": ["groupedBar", "bar", "stackedBar", "line", "scatter", "area", "heatmap", "box", "violin"]
+    },
+    "genderDistribution": {
+      "defaultType": "pie",
+      "compatibleTypes": ["pie", "donut"]
+    },
+    "totalPatientCount": {
+      "defaultType": "pie",
+      "compatibleTypes": ["pie", "donut"]
+    }
+  },
+  "resources": {
+    "OxygencylinderByDepartment": {
+      "defaultType": "line",
+      "compatibleTypes": ["line", "bar", "scatter", "area", "groupedBar", "stackedBar"]
+    },
+    "bloodUsedByDepartment": {
+      "defaultType": "line",
+      "compatibleTypes": ["line", "bar", "scatter", "area", "groupedBar", "stackedBar"]
+    },
+    "operationTheaterOccupancyByDepartment": {
+      "defaultType": "bar",
+      "compatibleTypes": ["bar", "groupedBar", "stackedBar", "line", "scatter", "area"]
+    },
+    "operationTheaterContributionByDepartment": {
+      "defaultType": "pie",
+      "compatibleTypes": ["pie", "donut"]
+    },
+    "bloodPacketsUsedByBloodGroup": {
+      "defaultType": "pie",
+      "compatibleTypes": ["pie", "donut"]
+    }
+  }
+}

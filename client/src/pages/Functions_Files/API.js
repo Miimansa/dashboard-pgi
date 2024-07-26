@@ -1,0 +1,20 @@
+export const homedata_url = process.env.REACT_APP_BACKEND_URL + 'home/'
+export const get_dept_url = process.env.REACT_APP_BACKEND_URL + 'dashboard/dept_names'
+export const signup_url = process.env.REACT_APP_BACKEND_URL + 'auth/register'
+export const login_url = process.env.REACT_APP_BACKEND_URL + 'auth/login'
+export const opt_url = process.env.REACT_APP_BACKEND_URL + 'auth/verify-otp'
+export const resend_opt_url = process.env.REACT_APP_BACKEND_URL + 'auth/resend-otp'
+export const update_user_url = process.env.REACT_APP_BACKEND_URL + 'auth/user-settings'
+export const update_usertheme_url = process.env.REACT_APP_BACKEND_URL + 'auth/update-theme'
+export const validuser_url = process.env.REACT_APP_BACKEND_URL + 'auth/check-token'
+export const labdata_url = process.env.REACT_APP_BACKEND_URL + 'lab/'
+export const resources_url = process.env.REACT_APP_BACKEND_URL + 'resources/'
+export const emergency_url = process.env.REACT_APP_BACKEND_URL + 'emergency/'
+export const disease_url = process.env.REACT_APP_BACKEND_URL + 'disease/'
+export const get_test_type_url = process.env.REACT_APP_BACKEND_URL + 'lab/get_type'
+export const request_pass_url = process.env.REACT_APP_BACKEND_URL + 'auth/reset-password-request'
+export const verify_request_url = process.env.REACT_APP_BACKEND_URL + 'auth/verify-reset-otp'
+export const changepass_url = process.env.REACT_APP_BACKEND_URL + 'auth/reset-password'
+
+
+

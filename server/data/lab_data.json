@@ -1,0 +1,64 @@
+{
+    "LabOrderCount": [
+      {
+        "x": ["Cardiology", "Neurology", "Oncology", "Orthopedics"],
+        "y": [500, 300, 700, 400],
+        "type": "bar",
+        "name": "Lab Order Count"
+      }
+    ],
+    "labOrdersByDepartment": [
+      {
+        "values": [500, 300, 700, 400],
+        "labels": ["Cardiology", "Neurology", "Oncology", "Orthopedics"],
+        "type": "pie",
+        "name": "Lab Orders by Department"
+      }
+    ],
+    "monthlyLabTestCounts": [
+      {
+        "x": ["2023-05", "2023-04", "2023-03", "2023-02", "2023-01"],
+        "y": [750, 680, 770, 710, 790],
+        "mode": "lines+markers",
+        "name": "Blood Test"
+      },
+      {
+        "x": ["2023-05", "2023-04", "2023-03", "2023-02", "2023-01"],
+        "y": [430, 390, 440, 400, 450],
+        "mode": "lines+markers",
+        "name": "Urine Test"
+      },
+      {
+        "x": ["2023-05", "2023-04", "2023-03", "2023-02", "2023-01"],
+        "y": [208, 205, 209, 191, 197],
+        "mode": "lines+markers",
+        "name": "Other Tests"
+      }
+    ],
+    "patientCountByDepartment": [
+      {
+        "type": "scatterpolar",
+        "r": [20, 25, 30],
+        "theta": ["Inpatient", "Outpatient", "Emergency"],
+        "fill": "toself",
+        "name": "Cardiology",
+        "hovertemplate": "Department: %{theta}<br>Patients: %{r}<extra></extra>"
+      },
+      {
+        "type": "scatterpolar",
+        "r": [15, 20, 10],
+        "theta": ["Inpatient", "Outpatient", "Emergency"],
+        "fill": "toself",
+        "name": "Neurology",
+        "hovertemplate": "Department: %{theta}<br>Patients: %{r}<extra></extra>"
+      },
+      {
+        "type": "scatterpolar",
+        "r": [30, 10, 20],
+        "theta": ["Inpatient", "Outpatient", "Emergency"],
+        "fill": "toself",
+        "name": "Orthopedics",
+        "hovertemplate": "Department: %{theta}<br>Patients: %{r}<extra></extra>"
+      }
+    ]
+  }

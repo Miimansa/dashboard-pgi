@@ -1,0 +1,118 @@
+.main {
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: auto;
+    gap: 20px;
+}
+
+.heading {
+    display: flex;
+    font-size: 20px;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.buttons button {
+    padding: 6px;
+    border: none;
+    border-radius: 20px;
+    width: 150px;
+    font-size: 18px;
+    padding: 10px;
+    background: radial-gradient(circle at 0.8% 1.8%, rgb(255, 104, 107) 0%, rgb(255, 187, 103) 90.1%);
+    color: var(--primary-color-text);
+    transition: all ease 200ms;
+}
+
+.buttons button:hover {
+    cursor: pointer;
+    box-shadow: var(--box-shadow-color) 0px 5px 15px;
+
+}
+
+.items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+}
+
+.items input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60%;
+    padding: 8px;
+    border-radius: 9px;
+    border: none;
+    background-color: #e1d5c7;
+
+}
+
+.items input:focus {
+    outline: var(--primary-color-background);
+}
+
+.links {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.loginup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    height: 120px;
+}
+
+.loginup img {
+    height: 65px;
+    width: 65px;
+}
+
+.buttons_verifyotp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.otpmaindiv {
+    display: flex;
+    flex-direction: column;
+    height: 200px;
+    margin: auto;
+    gap: 20px;
+}
+
+.otpmain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.inputotp {
+    width: 2.3rem;
+    height: 2rem;
+    margin: 0 0.5rem;
+    font-size: 2rem;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+}
+
+.sendbuttons {
+    display: flex;
+    gap: 20px;
+}

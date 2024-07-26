@@ -1,0 +1,86 @@
+{
+    "home": {
+      "departmentWisePatientCount": {
+        "SelectedType": "line"
+      },
+      "visitsVsAdmissions": {
+        "SelectedType": "line"
+      },
+      "genderCount": {
+        "SelectedType": "groupedBar"
+      },
+      "departmentWisePatients": {
+        "SelectedType": "pie"
+      },
+      "genderDistribution": {
+        "SelectedType": "pie"
+      }
+    }
+    ,
+
+    "labs": {
+      "LabOrderCount": {
+        "SelectedType": "line"
+      },
+      "labOrdersByDepartment": {
+        "SelectedType": "line"
+      },
+      "monthlyLabTestCounts": {
+        "SelectedType": "line"
+      },
+      "patientCountByDepartment": {
+        "SelectedType": "pie"
+      }
+    },
+    "disease": {
+      "diseaseCounts": {
+        "SelectedType": "line"
+      },
+      "deathTally": {
+        "SelectedType": "line"
+      },
+      "patientCountByDisease": {
+        "SelectedType": "bar"
+      },
+      "genderAgeDistribution": {
+        "SelectedType": "pie"
+      },
+      "totalSurvivalRate": {
+        "SelectedType": "gauge"
+      }
+    },
+    "emergency": {
+      "uniquePatientCounts": {
+        "SelectedType": "line"
+      },
+      "survivalDeathCounts": {
+        "SelectedType": "groupedBar"
+      },
+      "durationOfStay": {
+        "SelectedType": "groupedBar"
+      },
+      "genderDistribution": {
+        "SelectedType": "pie"
+      },
+      "totalPatientCount": {
+        "SelectedType": "pie"
+      }
+    },
+    "resources": {
+      "OxygencylinderByDepartment": {
+        "SelectedType": "line"
+      },
+      "bloodUsedByDepartment": {
+        "SelectedType": "line"
+      },
+      "operationTheaterOccupancyByDepartment": {
+        "SelectedType": "bar"
+      },
+      "operationTheaterContributionByDepartment": {
+        "SelectedType": "pie"
+    },
+      "bloodPacketsUsedByBloodGroup": {
+        "SelectedType": "pie"
+      }
+    }
+  }

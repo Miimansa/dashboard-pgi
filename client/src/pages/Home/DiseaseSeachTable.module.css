@@ -1,0 +1,151 @@
+/* Material-UI styles */
+.MuiContainer-root {
+  background-color: var(--primary-color-background);
+  color: var(--primary-color-text);
+  padding: 20px;
+  width: 100%;
+  /* Ensure the container takes up the full width */
+  max-width: none;
+  /* Remove any maximum width restriction */
+  margin-left: 0;
+  /* Remove left margin */
+  margin-right: 0;
+  /* Remove right margin */
+}
+
+/* .MuiInputBase-input MuiOutlinedInput-input{
+  color: var(--secondary-color-text);
+  background-color: var(--secondary-color-background);
+} */
+.table.table-striped {
+  table-layout: fixed;
+}
+
+.MuiFormControl-root {
+  background-color: yellow !important;
+}
+
+.table.table-striped th,
+.table.table-striped td {
+
+  padding: 8px;
+}
+
+.table.table-striped th:first-child,
+.table.table-striped td:first-child {
+  text-align: left;
+  width: 20%;
+}
+
+.table.table-striped th:not(:first-child),
+.table.table-striped td:not(:first-child) {
+  text-align: right;
+  width: calc(80% /4);
+}
+
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+
+i[data-tooltip]::after {
+  content: attr(data-tooltip);
+  width: max-content;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--primary-color-text);
+  transform: scale(0);
+  transition: 0.2s ease-in-out;
+}
+
+i[data-tooltip]:hover::after {
+  transform: scale(1);
+  bottom: -150%;
+}
+
+
+.MuiInputBase-root {
+  height: 50px;
+  /* Adjust the height as needed */
+}
+
+.MuiOutlinedInput-root {
+  height: 100%;
+  /* Ensure the input box takes up the full height */
+}
+
+
+.MuiPaper-root {
+  background-color: var(--primary-color-background);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+}
+
+.MuiButton-root {
+  margin: 8px;
+  background-color: var(--primary-color-background);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.MuiButton-root:hover {
+  background-color: var(--hover-color-background);
+  transform: scale(1.05);
+}
+
+.MuiTable-root {
+  background-color: var(--primary-color-background);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.MuiTableHead-root {
+  background-color: var(--primary-color-background);
+  color: var(--primary-color-text);
+}
+
+/* .MuiTableRow-root:nth-of-type(odd) {
+  background-color: var(--card-hover-color);
+} */
+
+.MuiInputBase-root {
+  color: var(--primary-color-text);
+  background-color: var(--primary-color-background);
+  border-color: var(--primary-color-background);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.button {
+  background-color: var(--primary-color-background);
+}
+
+.div1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.maindiv {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-left: 30px;
+  padding-right: 30px;
+  gap: 20px;
+}
+
+.div1_head {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+#modal-title {
+  color: var(--primary-color-text);
+}
+
+.dateinput:focus {
+  outline: none;
+}
