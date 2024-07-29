@@ -6,6 +6,14 @@
     background-color: var(--primary-color-background_container);
 }
 
+.search_button{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    background-color: var(--primary-color-background_container);
+}
 .contdown {
     display: flex;
     height: 100%;

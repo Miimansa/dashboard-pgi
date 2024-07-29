@@ -19,6 +19,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { ScaleLoader } from 'react-spinners';
 import MenuSimple from "./MU_dropdown";
 import { message } from "antd";
+
 const Dashboard = ({ Department_list }) => {
     const dispatch = useDispatch();
 
@@ -87,7 +88,6 @@ const Dashboard = ({ Department_list }) => {
 
     // getting data from store
     const department_store = useSelector((state) => state.filter.department);
-
 
     // adding all department list to usestate
     const [op_dept, setOp_dept] = useState();
@@ -275,7 +275,7 @@ const Dashboard = ({ Department_list }) => {
                                                 dateFormat={group_in?.name === 'Monthly' ? "MM-yyyy" : group_in?.name === 'Yearly' ? "yyyy" : "MM-dd-yyyy"}
                                                 showMonthYearPicker={group_in?.name === 'Monthly'}
                                                 showYearPicker={group_in?.name === 'Yearly'}
-                                                placeholderText="Start Date"
+                                                placeholderText="End Date"
                                                 className={Styles.datepicker}
                                                 minDate={new Date("2010-01-01")}
                                                 maxDate={new Date("2019-12-31")}
@@ -284,21 +284,20 @@ const Dashboard = ({ Department_list }) => {
 
                                         <div className={Styles.multi_select}>
                                             <Select
-
                                                 options={op_dept}
                                                 placeholder="Select Department..."
                                                 onChange={setDepartment_in}
                                                 styles={colourStyles}
                                                 isMulti
                                                 defaultValue={department_in}
-                                            /></div>
-
+                                            />
+                                        </div>
                                     </div>
                                     <div className={Styles.search_button}>
                                         <button onClick={setValues}> <FaSearchPlus /> Search</button>
+                                        <button onClick={() => setSearch(false)}>X</button>
                                     </div>
                                 </div>
-
                         }
                         <div className={Styles.profile} ><MenuSimple />
                         </div>
@@ -320,4 +319,5 @@ const Dashboard = ({ Department_list }) => {
         </div >
     </>)
 }
+
 export default Dashboard;
