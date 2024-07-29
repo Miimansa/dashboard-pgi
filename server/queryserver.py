@@ -181,12 +181,7 @@ def construct_query(disease_name, synonyms):
 
     # Construct the query with dynamic parameters
     query = """
-            SELECT  count(*) AS visits,23 as patients,9 as discharge_summaries ,4 as ds_patients 
-            FROM disease_record
-            WHERE
-                LOWER(REPLACE(disease_name, ' ', '')) LIKE %s
-                OR LOWER(REPLACE(disease_desc, ' ', '')) LIKE %s
-            
+            SELECT  0 AS visits,0 as patients,0 as discharge_summaries ,0 as ds_patients     
         """
 
     # Add additional condition for synonyms

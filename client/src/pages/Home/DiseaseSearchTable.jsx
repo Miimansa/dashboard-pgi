@@ -319,7 +319,7 @@ function DiseaseSearchTable() {
       const srno_response = await axios.get(`http://localhost:5354/max_sr_no?info_id=${newInfoId}`)
       const srno = srno_response.data;
       console.log("sr.no", { srno });
-      setMaxSrNo(srno);
+      setMaxSrNo(srno+1);
       console.log(maxSrNo)
       // Add new records to the patient_counts_disease table
       const diseasePromises = additionalDiseaseNameList.map(
