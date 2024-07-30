@@ -117,7 +117,7 @@ const Labs = () => {
                         <div className={Styles.down_downchild1}>
                             <FlexiblePlotlyChart data={data?.monthly_lab_test_counts}
                                 key={`chart-${themeKey}`}
-                                chartTitle="Lab test types count"
+                                chartTitle="Lab Test types count"
                                 xAxisTitle="Time"
                                 yAxisTitle="Count"
                                 // chartType={"line"}
@@ -127,7 +127,7 @@ const Labs = () => {
                         <div className={Styles.down_downchild2}>
                             <FlexiblePlotlyChart
                                 data={formatDataForPieChart(data?.patient_count_by_department)}
-                                chartTitle={"Department wise lab ordres"}
+                                chartTitle={"Department wise Lab orders"}
                                 chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
                                 // chartType={"pie"}
                                 key={`chart-${themeKey}`}

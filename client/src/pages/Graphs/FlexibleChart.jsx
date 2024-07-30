@@ -20,37 +20,39 @@ const FlexiblePlotlyChart = ({
     'Others': '#2ca02c'  // Green
   };
   const getCssVariable = (variable) => getComputedStyle(document.documentElement).getPropertyValue(variable);
-  // Accessing the CSS variables
-  // console.log(chartTitle, chartType)
-  // console.log(Array.isArray(data))
-  // console.log(data)
+  
   if (!data || !(Array.isArray(data))) data = [];
   const backgroundColor = 'rgba(0,0,0,0)'
   const textColor = getCssVariable('--plotly-text-color');
   const legendBackgroundColor = getCssVariable('--plotly-legend-background-color');
   const legendBorderColor = getCssVariable('--plotly-legend-border-color');
-  console.log(issmallfont)
+
+  const isDataEmpty = !data || data.length === 0 || (data[0] && Object.keys(data[0]).length === 0);
+
   const getChartData = () => {
-    if (!data) {
-      return []
+    if (isDataEmpty) {
+      return [{
+        type: 'scatter',
+        x: [0],
+        y: [0],
+        mode: 'text',
+        text: ['No data available'],
+        textposition: 'middle center',
+        hoverinfo: 'none'
+      }];
     }
+
     switch (chartType) {
       case 'line':
       case 'scatter':
-        // console.log('line data')
-        // console.log(data)
-        return data.map(series => {
-          // console.log('Series name:', series.name);
-          // console.log('Assigned color:', GENDER_COLORS[series.name]);
-          return {
-            x: series.x,
-            y: series.y,
-            name: series.name,
-            type: chartType,
-            mode: 'lines+markers',
-            marker: { color: GENDER_COLORS[series.name] }
-          };
-        });
+        return data.map(series => ({
+          x: series.x,
+          y: series.y,
+          name: series.name,
+          type: chartType,
+          mode: 'lines+markers',
+          marker: { color: GENDER_COLORS[series.name] }
+        }));
       case 'bar':
       case 'groupedBar':
         return data.map(series => ({
@@ -59,7 +61,6 @@ const FlexiblePlotlyChart = ({
           name: series.name,
           type: 'bar',
           marker: { color: GENDER_COLORS[series.name] || undefined }
-
         }));
       case 'stackedBar':
         return data.map(series => ({
@@ -81,8 +82,6 @@ const FlexiblePlotlyChart = ({
         }));
       case 'pie':
       case 'donut':
-        // console.log('pie data')
-        // console.log(data)
         return [{
           labels: data[0].labels,
           values: data[0].values,
@@ -90,11 +89,7 @@ const FlexiblePlotlyChart = ({
           textposition: 'inside',
           hole: chartType === 'donut' ? 0.4 : 0,
           marker: {
-            colors: data[0].labels.map(label => {
-              // console.log('Pie segment label:', label);
-              // console.log('Assigned color:', GENDER_COLORS[label]);
-              return GENDER_COLORS[label];
-            })
+            colors: data[0].labels.map(label => GENDER_COLORS[label])
           },
           sort: false
         }];
@@ -169,30 +164,40 @@ const FlexiblePlotlyChart = ({
         return [];
     }
   };
+
   const font = issmallfont ? 10 : 12;
   const layout = {
     title: {
       text: chartTitle,
       font: { weight: 'bold' }
     },
-    xaxis: {
+    plot_bgcolor: backgroundColor,
+    paper_bgcolor: backgroundColor,
+    font: { color: textColor, size: font },
+    autosize: true,
+    responsive: true,
+    showlegend: false,
+    margin: { l: 20, r: 20, t: 60, b: 20 },
+  };
+
+  if (isDataEmpty) {
+    layout.xaxis = { visible: false, showgrid: false, zeroline: false };
+    layout.yaxis = { visible: false, showgrid: false, zeroline: false };
+  } else {
+    layout.xaxis = {
       title: xAxisTitle,
       gridcolor: 'rgba(51, 51, 51, 1)',
       automargin: true,
       tickmode: 'array',
-      tickvals: 'data',  // This tells Plotly to use all unique values from the data
-      type: 'category',  // This treats the x values as discrete categories
-    },
-    yaxis: {
+      tickvals: 'data',
+      type: 'category',
+    };
+    layout.yaxis = {
       title: yAxisTitle,
       gridcolor: 'rgba(51, 51, 51, 1)',
       automargin: true,
-    },
-    barmode: chartType === 'groupedBar' ? 'group' : undefined,
-    plot_bgcolor: backgroundColor,
-    paper_bgcolor: backgroundColor,
-    font: { color: textColor, size: font },
-    legend: {
+    };
+    layout.legend = {
       orientation: 'h',
       yanchor: 'bottom',
       y: 1.02,
@@ -202,77 +207,58 @@ const FlexiblePlotlyChart = ({
       bgcolor: legendBackgroundColor,
       bordercolor: legendBorderColor,
       borderwidth: 1,
-    },
-    margin: { l: 50, r: 50, t: 90, b: 90 },
-    autosize: true,
-    responsive: true
-  };
-
-  // Specific layout adjustments for certain chart types
-  if (chartType === 'radar') {
-    layout.polar = {
-      radialaxis: { visible: true, range: [0, 100] }
     };
-  } else if (chartType === 'pyramid') {
-    layout.yaxis = { ...layout.yaxis, autorange: 'reversed' };
-  } else if (['gauge', 'treemap', 'sunburst'].includes(chartType)) {
-    layout.xaxis = undefined;
-    layout.yaxis = undefined;
-  } else if (['pie', 'donut'].includes(chartType)) {
+    layout.margin = { l: 50, r: 50, t: 90, b: 90 };
     layout.showlegend = true;
-    layout.legend = {
-      ...layout.legend,
-      orientation: 'vertical',
-      yanchor: 'top',
-      itemsizing: 'constant',
-    };
-    layout.margin = { l: 20, r: 20, t: 60, b: 20 };
+
+    if (chartType === 'radar') {
+      layout.polar = {
+        radialaxis: { visible: true, range: [0, 100] }
+      };
+    } else if (chartType === 'pyramid') {
+      layout.yaxis = { ...layout.yaxis, autorange: 'reversed' };
+    } else if (['gauge', 'treemap', 'sunburst'].includes(chartType)) {
+      layout.xaxis = undefined;
+      layout.yaxis = undefined;
+    } else if (['pie', 'donut'].includes(chartType)) {
+      layout.showlegend = true;
+      layout.legend = {
+        ...layout.legend,
+        orientation: 'vertical',
+        yanchor: 'top',
+        itemsizing: 'constant',
+      };
+      layout.margin = { l: 20, r: 20, t: 60, b: 20 };
+    }
   }
 
-  // Check if data is empty
-  const isDataEmpty = !data || data.length === 0;
+  const chartData = getChartData();
 
-  const chartData = isDataEmpty && ['pie', 'donut'].includes(chartType)
-    ? [{
-      type: 'pie',
-      labels: ['No Data'],
-      values: [1],
-      textinfo: 'none',
-      hoverinfo: 'none',
-      marker: { colors: ['#e0e0e0'] },
-      hole: chartType === 'donut' ? 0.4 : 0
-    }]
-    : getChartData();
   const handlePlotClick = (event) => {
+    if (isDataEmpty) return;
+
     const point = event.points[0];
-    console.log(point)
-    if (point && onBarClick && (chartType === 'bar' || chartType === 'groupedBar'||chartType==='line'||chartType==='area')) {
+    if (point && onBarClick && (chartType === 'bar' || chartType === 'groupedBar' || chartType === 'line' || chartType === 'area')) {
       const clickedX = point.x.toString();
       const seriesName = point.data.name;
-      console.log(seriesName)
-      console.log(clickedX)
-      // Find the index of the clicked x value in the original data
       const clickedIndex = data.find(series => series.name === seriesName).x.indexOf(clickedX);
-      console.log("clicked index",clickedIndex)
-      // Filter the data for all series at this index
       const filteredData = data.map(series => ({
         name: series.name,
         x: series.x[clickedIndex],
         y: series.y[clickedIndex]
       }));
-
-      console.log('About to call onBarClick with filteredData:', filteredData);
       onBarClick(filteredData);
     }
   };
+
   return (
     <Plot
       data={chartData}
       layout={layout}
       useResizeHandler={true}
       style={{ width: '100%', height: '100%' }}
-      config={{ responsive: true }}
-      onClick={handlePlotClick}
+      config={{ responsive: true, displayModeBar: !isDataEmpty }}
+      onClick={!isDataEmpty ? handlePlotClick : undefined}
     />
   );
 };
