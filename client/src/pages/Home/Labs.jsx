@@ -14,6 +14,8 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { formatDataForPieChart } from "../Functions_Files/file_functions";
 import { colourStyles } from "../Functions_Files/filters_data";
 import Select from 'react-select'
+import Switch from '@mui/material/Switch';
+import { message } from "antd";
 import { options_tests } from "../Functions_Files/filters_data";
 
 const Labs = () => {
@@ -22,6 +24,12 @@ const Labs = () => {
     const [typetest, settypetest] = useState([]);
     const [type, settype] = useState(['initial']);
     const [type_string, settype_string] = useState();
+    const [checked, setChecked] = React.useState(true);
+    const handleChange = (e) => {
+        setChecked(e.target.checked);
+        if (e.target.checked) message.info("Pie chart showing data for Gender Count")
+        else message.info("Pie chart showing data for Visits vs admissions count")
+    };
     const changetypeformat = (data) => {
         const formattedType = data.map(item => ({
             label: item,
@@ -125,13 +133,31 @@ const Labs = () => {
                             />
                         </div>
                         <div className={Styles.down_downchild2}>
-                            <FlexiblePlotlyChart
-                                data={formatDataForPieChart(data?.patient_count_by_department)}
-                                chartTitle={"Department wise lab ordres"}
-                                chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
-                                // chartType={"pie"}
-                                key={`chart-${themeKey}`}
-                            />
+                        <Switch
+                                    checked={checked}
+                                    onChange={handleChange}
+                                    inputProps={{ 'aria-label': 'controlled' }}
+                                />
+                                 <>
+                                    {checked ?
+                                         <FlexiblePlotlyChart
+                                         data={formatDataForPieChart(data?.patient_count_by_department)}
+                                         chartTitle={"Lab Test wise lab orders"}
+                                         chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
+                                         // chartType={"pie"}
+                                         key={`chart-${themeKey}`}
+                                     />
+                                        :
+                                        <FlexiblePlotlyChart
+                                        data={formatDataForPieChart(data?.patient_count_by_total_department)}
+                                        chartTitle={"Department wise lab orders"}
+                                        chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
+                                        // chartType={"pie"}
+                                        key={`chart-${themeKey}`}
+                                    />
+                                    }
+                                </>
+                           
 
                         </div>
                     </div>

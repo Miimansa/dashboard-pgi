@@ -311,6 +311,32 @@ def reset_password():
 
     return jsonify({"message": "Password reset successfully"}), 200
 
+@auth_bp.route('/new-password', methods=['POST'])
+def change_password():
+    data = request.get_json()
+    email = data.get('email')
+    old_password = data.get('old_password')
+    new_password = data.get('new_password')
+    
+    if not email or not old_password or not new_password:
+        return jsonify({"message": "Email, old password, and new password are required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    # Check if the old password is correct
+    if not bcrypt.check_password_hash(user.password, old_password):
+        return jsonify({"message": "Incorrect old password"}), 401
+
+    # Hash the new password and update
+    hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+    user.password = hashed_password
+    db.session.commit()
+
+    return jsonify({"message": "Password changed successfully"}), 200
+
 @auth_bp.errorhandler(Exception)
 def handle_exception(e):
     # Log the error here (e.g., using app.logger.error(str(e)))

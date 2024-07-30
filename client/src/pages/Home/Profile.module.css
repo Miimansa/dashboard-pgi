@@ -7,7 +7,86 @@
 .root {
     background-color: var(--primary-color-background);
 }
+.save_button {
+    width: 100px;
+    padding: 5px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--primary-color-background);
+    color: var(--secondary-text-color);
+    transition: all ease 100ms;
+    font-weight: bold;
+}
 
+.ChangePassword:hover {
+    scale: 1.2;
+}
+.ChangePassword {
+    width: 100px;
+    padding: 5px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--primary-color-background);
+    color: var(--secondary-text-color);
+    transition: all ease 100ms;
+    font-weight: bold;
+}
+.passwordButtons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.passwordButtons button {
+    width: 150px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--primary-color-background);
+    color: var(--secondary-text-color);
+    transition: all ease 100ms;
+    font-weight: bold;
+}
+
+.passwordButtons button:hover {
+    background-color: var(--hover-color-background);
+}
+
+.save_button:hover {
+    scale: 1.2;
+}
+.submitPassword {
+    width: 250px;
+    padding: 5px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--primary-color-background);
+    color: var(--secondary-text-color);
+    transition: all ease 100ms;
+    font-weight: bold;
+}
+
+.submitPassword:hover {
+    scale: 1.2;
+}
 .backprofile {
     position: absolute;
     top: 2%;
