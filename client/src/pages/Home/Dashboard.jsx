@@ -30,7 +30,23 @@ const Dashboard = ({ Department_list }) => {
     const [from_date_in, setFrom_date_in] = useState(new Date("2010-01-01"));
     const [to_date_in, setTo_date_in] = useState(new Date("2019-12-31"));
     const [active, setActive] = useState([false, false, false, false, false, false]);
-
+    const defaultValues = {
+        group: option_groups[1],
+        department: Department_list ? Department_list.map(item => ({ label: item, value: item })) : [],
+        from_date: new Date("2010-01-01"),
+        to_date: new Date("2019-12-31")
+      };
+      const resetFilters = () => {
+        setGroup_in(defaultValues.group);
+        setDepartment_in(defaultValues.department);
+        setFrom_date_in(defaultValues.from_date);
+        setTo_date_in(defaultValues.to_date);
+        dispatch(setGroup(defaultValues.group.name));
+        dispatch(setFrom_date(defaultValues.from_date.toLocaleDateString('en-US')));
+        dispatch(setTo_date(defaultValues.to_date.toLocaleDateString('en-US')));
+        dispatch(setDepartment(Department_list.join(", ")));
+        setSearch(false);
+      };
     // To collapse navbar
     const [hide, setHide] = useState(false);
     const hideonclick = () => setHide(!hide);
@@ -178,16 +194,21 @@ const Dashboard = ({ Department_list }) => {
                     <Link to='emergency' className={Styles.links}>
                         <div className={`${Styles.items} ${active[3] && Styles.isactive}`} >
                             <BiSolidBellPlus />
-                            <p className={`${hide && Styles.hide_onclick}`}>Emergency</p>
+                            <p className={`${hide && Styles.hide_onclick}`}>Admissions</p>
                         </div>
                     </Link>
-                    <Link to='disease' className={Styles.links}>
+                    {/* <Link to='disease' className={Styles.links}>
                         <div className={`${Styles.items} ${active[4] && Styles.isactive}`} >
                             <IoBody />
                             <p className={`${hide && Styles.hide_onclick}`}>Disease</p>
                         </div>
-                    </Link>
+                    </Link> */}
                     {/* <Link to='PatientExplorer' className={Styles.links}> */}
+                    <div
+                        className={`${Styles.items_query}`}>
+                        <BsPatchQuestionFill />
+                        <p style={{ fontSize: '15px' }} className={`${hide && Styles.hide_onclick}`}>Disease</p>
+                    </div>
                     <div
                         className={`${Styles.items_query}`}>
                         <BsPatchQuestionFill />
@@ -292,11 +313,14 @@ const Dashboard = ({ Department_list }) => {
                                                 defaultValue={department_in}
                                             />
                                         </div>
-                                    </div>
-                                    <div className={Styles.search_button}>
+                                        <div className={Styles.search_button}>
                                         <button onClick={setValues}> <FaSearchPlus /> Search</button>
+                                        <button onClick={resetFilters}>Reset</button>
                                         <button onClick={() => setSearch(false)}>X</button>
+                                        </div>
                                     </div>
+                                    
+                                    
                                 </div>
                         }
                         <div className={Styles.profile} ><MenuSimple />

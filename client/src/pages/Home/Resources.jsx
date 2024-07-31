@@ -78,12 +78,17 @@ const Resources = () => {
                             />
                         </div>
                         <div className={Styles.down_upchild}>
-                            <FlexiblePlotlyChart
+                            {/* <FlexiblePlotlyChart
                                 data={data?.OxygencylinderByDepartment}
                                 chartTitle="Department wise oxygen cylinder count"
                                 xAxisTitle="Date"
                                 yAxisTitle="cylinders"
                                 chartType={Userselection?.bio?.resources?.OxygencylinderByDepartment?.SelectedType}
+                            /> */}
+                            <FlexiblePlotlyChart
+                                data={formatDataForPieChart(data?.bloodPacketsUsedByBloodGroup)}
+                                chartTitle={"Blood group wise"}
+                                chartType={Userselection?.bio?.resources?.bloodPacketsUsedByBloodGroup?.SelectedType}
                             />
                         </div>
                     </div>
@@ -101,14 +106,10 @@ const Resources = () => {
                         <div className={Styles.down_downchild2}>
                             <FlexiblePlotlyChart
                                 data={formatDataForPieChart(data?.operationTheaterContributionByDepartment)}
-                                chartTitle="Department wise blood packet"
+                                chartTitle="Department wise OT request"
                                 chartType={Userselection?.bio?.resources?.operationTheaterContributionByDepartment?.SelectedType}
                             />
-                            <FlexiblePlotlyChart
-                                data={formatDataForPieChart(data?.bloodPacketsUsedByBloodGroup)}
-                                chartTitle={"Group wise blood packet"}
-                                chartType={Userselection?.bio?.resources?.bloodPacketsUsedByBloodGroup?.SelectedType}
-                            />
+                            
                         </div>
                     </div>
                 </div>

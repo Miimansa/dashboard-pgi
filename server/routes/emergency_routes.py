@@ -2,8 +2,9 @@ from flask import Blueprint ,jsonify,request
 from services.emergency_service import EmergencyServices
 from flask_jwt_extended import jwt_required
 from datetime import datetime
-
-from SQL_Data.fetch_emergency_data import fetch_emergency_data_1,fetch_emergency_data_2,fetch_emergency_data_3
+import psycopg2
+from config import Config
+from SQL_Data.fetch_emergency_data import fetch_emergency_data_1,fetch_emergency_data_2,fetch_emergency_data_3,fetch_emergency_data_4
 emergency_bp=Blueprint('emergency',__name__)
 
 @emergency_bp.route('/',methods=['GET'])
@@ -16,6 +17,7 @@ def emergency():
     date_to = datetime.strptime(date_to, '%m-%d-%Y')
     department_names = request.args.get('department_names', '').split(',')
     grouping_type = request.args.get('grouping_type', 'monthly').lower()
+    discharge_type= request.args.get('type')
     print(grouping_type)
     if(grouping_type=='monthly'):
         date_from=date_from.strftime('%m-%Y')
@@ -28,9 +30,46 @@ def emergency():
         date_to=date_to.strftime('%Y')
     # Initialize the service (assuming similar logic to fetch lab data)
     emergency_data_1=fetch_emergency_data_1(date_from, date_to, department_names, grouping_type)
-    emergency_data_2=fetch_emergency_data_2(date_from, date_to, department_names, grouping_type)
+    emergency_data_2=fetch_emergency_data_2(date_from, date_to, department_names, grouping_type,discharge_type)
     emergency_data_3=fetch_emergency_data_3(date_from, date_to, department_names, grouping_type)
-    emergency_service = EmergencyServices(emergency_data_1,emergency_data_2,emergency_data_3)
+    emergency_data_4=fetch_emergency_data_4(date_from, date_to, department_names, grouping_type)
+    emergency_service = EmergencyServices(emergency_data_1,emergency_data_2,emergency_data_3,emergency_data_4)
     # Get the data
     data = emergency_service.get_all_emergency_data(date_from, date_to, department_names, grouping_type)
     return jsonify(data)
+
+db_params = {
+        'dbname': Config.DB_NAME,
+        'user': Config.DB_USER,
+        'password': Config.DB_PASSWORD,
+        'host': Config.DB_HOST
+    }
+@emergency_bp.route('/get_dischargeType', methods=['GET'])
+# @jwt_required()
+def get_type():
+        try:
+            conn = psycopg2.connect(**db_params)
+            cur = conn.cursor()
+            query = """ SELECT DISTINCT dischargestatus 
+                FROM (
+                    SELECT dischargestatus 
+                    FROM mv_dash_emrg_one_yearly 
+                    ORDER BY dischargestatus DESC
+                ) AS subquery"""
+            cur.execute(query)
+            rows = cur.fetchall()
+            
+            # Converting the fetched data into a list of strings
+            lab_names = [row[0] for row in rows]
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            lab_names = []
+            
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+        return lab_names

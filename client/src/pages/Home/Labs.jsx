@@ -1,11 +1,7 @@
 import React from "react";
-import LineChart from "../Graphs/LineChart";
-import PieChart from "../Graphs/PieChart";
-import GroupedBarChart from "../Graphs/GroupedBarChart";
+
 import { useState, useEffect } from "react";
 import Styles from './Labs.module.css'
-import RadarChart from "../Graphs/RadarChart";
-import { LabOrderCount, labOrdersByDepartment, monthlyLabTestCounts, patientCountByDepartment } from '../Graphs/data/labdata'
 import FlexiblePlotlyChart from "../Graphs/FlexibleChart";
 import { useDispatch, useSelector } from "react-redux";
 import { setloading_text } from "../../state/filtersSlice";
@@ -16,13 +12,19 @@ import { colourStyles } from "../Functions_Files/filters_data";
 import Select from 'react-select'
 import Switch from '@mui/material/Switch';
 import { message } from "antd";
-import { options_tests } from "../Functions_Files/filters_data";
 
 const Labs = () => {
+    const loadSelectedTests = () => {
+        const savedTests = localStorage.getItem('selectedLabTests');
+        return savedTests ? JSON.parse(savedTests) : [null];
+      };
     const currentTheme = useSelector((state) => state.graph.currentTheme);
     const [themeKey, setThemeKey] = useState(0);
     const [typetest, settypetest] = useState([]);
-    const [type, settype] = useState(['initial']);
+    const [type, setType] = useState(() => {
+        const savedTests = loadSelectedTests();
+        return savedTests || ['initial'];
+      });
     const [type_string, settype_string] = useState();
     const [checked, setChecked] = React.useState(true);
     const handleChange = (e) => {
@@ -32,15 +34,23 @@ const Labs = () => {
     };
     const changetypeformat = (data) => {
         const formattedType = data.map(item => ({
-            label: item,
-            value: item
+          label: item,
+          value: item
         }));
         settypetest(formattedType);
-        if (type[0] === 'initial') settype(formattedType.slice(0, 5))
-    }
+        
+        const savedTests = loadSelectedTests();
+        if (savedTests) {
+          setType(savedTests);
+        } else if (type[0] === 'initial') {
+          setType(formattedType.slice(0, 5));
+        }
+      };
     const handleType = () => {
-        settype_string(type.map((item) => item.label).toString())
-    }
+        const typeString = type.map((item) => item.label).toString();
+        settype_string(typeString);
+        saveSelectedTests(type);
+      };
     useEffect(() => {
         setThemeKey(prevKey => prevKey + 1);
     }, [currentTheme]);
@@ -75,7 +85,11 @@ const Labs = () => {
     }, [department, group, from_date, to_date, type_string]);
     const [loading, setloading] = useState(true);
     const theme = useSelector((state => state.user.user.theme))
-
+    const saveSelectedTests = (tests) => {
+        localStorage.setItem('selectedLabTests', JSON.stringify(tests));
+      };
+      
+      
     return (<>
         {loading ?
             <div className={Styles.cont_preloader}>
@@ -110,14 +124,17 @@ const Labs = () => {
                         </div>
                     </div>
                     <div className={Styles.multi_select}>
-                        <Select
-                            onChange={settype}
-                            className={Styles.multi_select_in}
-                            placeholder="Select disease type..."
-                            styles={colourStyles}
-                            isMulti
-                            options={typetest}
-                            defaultValue={type}
+                    <Select
+                        onChange={(selectedOptions) => {
+                            setType(selectedOptions);
+                            saveSelectedTests(selectedOptions);
+                        }}
+                        className={Styles.multi_select_in}
+                        placeholder="Select disease type..."
+                        styles={colourStyles}
+                        isMulti
+                        options={typetest}
+                        value={type}
                         />
                         <button onClick={handleType}>Reload</button>
                     </div>
