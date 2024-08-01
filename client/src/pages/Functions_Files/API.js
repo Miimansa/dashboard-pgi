@@ -17,6 +17,6 @@ export const verify_request_url = process.env.REACT_APP_BACKEND_URL + 'auth/veri
 export const changepass_url = process.env.REACT_APP_BACKEND_URL + 'auth/reset-password'
 export const newPassword_url = process.env.REACT_APP_BACKEND_URL + 'auth/new-password'
 export const get_discharge_type_url = process.env.REACT_APP_BACKEND_URL + 'emergency/get_dischargeType'
-
+export const get_visit_url = process.env.REACT_APP_BACKEND_URL + 'home/get_visit'
 
 

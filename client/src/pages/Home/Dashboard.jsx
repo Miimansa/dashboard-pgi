@@ -175,7 +175,7 @@ const Dashboard = ({ Department_list }) => {
                     <Link to='' className={Styles.links} >
                         <div className={`${Styles.items}  ${active[0] && Styles.isactive}`} >
                             <HiHome />
-                            <p className={`${hide && Styles.hide_onclick}`}>Home</p>
+                            <p className={`${hide && Styles.hide_onclick}`}>Visits</p>
 
                         </div>
                     </Link>
