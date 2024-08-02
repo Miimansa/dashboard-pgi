@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { validUser } from "../Functions_Files/Fetchdata";
 import ClipLoader from "react-spinners/ClipLoader";
+import { message } from "antd";
+import { clearToken, clearUser } from "../../state/userSlice";
 const Protect = ({ children }) => {
     const token = useSelector((state) => state.user?.token);
+    console.log(token)
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(true);
     const [isValid, setIsValid] = useState(false);
+    const location = useLocation();
     const validateUser = async () => {
         if (!token) {
             navigate('/');
@@ -21,6 +26,7 @@ const Protect = ({ children }) => {
         } catch (error) {
             console.error('Error in validate user:', error);
             localStorage.clear();
+            message.info("login first")
             navigate('/');
             setIsLoading(false);
         } finally {
@@ -29,7 +35,7 @@ const Protect = ({ children }) => {
     };
     useEffect(() => {
         validateUser();
-    }, []);
+    }, [location.pathname]);
 
     if (isLoading) {
         return <div style={{

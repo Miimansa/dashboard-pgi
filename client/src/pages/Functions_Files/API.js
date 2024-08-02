@@ -15,6 +15,7 @@ export const get_test_type_url = process.env.REACT_APP_BACKEND_URL + 'lab/get_ty
 export const request_pass_url = process.env.REACT_APP_BACKEND_URL + 'auth/reset-password-request'
 export const verify_request_url = process.env.REACT_APP_BACKEND_URL + 'auth/verify-reset-otp'
 export const changepass_url = process.env.REACT_APP_BACKEND_URL + 'auth/reset-password'
+export const newPassword_url = process.env.REACT_APP_BACKEND_URL + 'auth/new-password'
 
 
 

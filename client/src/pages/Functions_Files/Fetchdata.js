@@ -1,5 +1,5 @@
 import axios from "axios";
-import { homedata_url, get_dept_url, signup_url, opt_url, login_url, resend_opt_url, update_user_url, update_usertheme_url, validuser_url, labdata_url, resources_url, emergency_url, disease_url, get_test_type_url, request_pass_url, verify_request_url, changepass_url } from "./API";
+import { homedata_url, get_dept_url, signup_url, opt_url, login_url, resend_opt_url, update_user_url, update_usertheme_url, validuser_url, labdata_url, resources_url, emergency_url, disease_url, get_test_type_url, request_pass_url, verify_request_url, changepass_url,newPassword_url } from "./API";
 
 // Function to get home data through axios
 const getdata_home = async (date_from, date_to, department_names, grouping_type, token) => {
@@ -230,4 +230,35 @@ const changePassword = async (email, password) => {
     const response = await axios.post(url, { "email": email, "new_password": password }, { headers });
     return response;
 }
-export { changePassword, requestVerify, requestResetPassword, gettypes_test, getdata_disease, getdata_emergency, getdata_resources, getdata_home, getDeptList, registerUser, verifyotp, resendOtp, loginUser, updateUser, updateUserTheme, validUser, getdata_lab }
+
+const changeNewPassword = async (email, oldPassword, newPassword) => {
+    const url = `${newPassword_url}`;
+
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.post(url, {
+            email: email,
+            old_password: oldPassword,
+            new_password: newPassword
+        }, { headers });
+
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            throw new Error(error.response.data.message || 'Failed to change password');
+        } else if (error.request) {
+            // The request was made but no response was received
+            throw new Error('No response received from server');
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            throw new Error('Error setting up the request');
+        }
+    }
+};
+
+export { changePassword, requestVerify, requestResetPassword, gettypes_test, getdata_disease, getdata_emergency, getdata_resources, getdata_home, getDeptList, registerUser, verifyotp, resendOtp, loginUser, updateUser, updateUserTheme, validUser, getdata_lab,changeNewPassword }

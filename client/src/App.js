@@ -29,7 +29,7 @@ function App() {
     if (!token) return
     const res = await getDeptList(token);
     setDeptlist(res);
-    dispatch(setDepartment(res.join(', ')));
+    if (res) dispatch(setDepartment(res.join(', ')));
   };
   useEffect(() => {
     fetchData();
@@ -51,13 +51,13 @@ function App() {
             <Route path="signup" element={<Signup />} />
             <Route path="forgetpassword" element={<Forgetpassword />} />
           </Route>
-          <Route path="dashboard" element={<Protect children={<Dashboard Department_list={deptList} />} />} >
-            <Route path="" element={<Home />} />
-            <Route path="labs" element={<Labs />} />
-            <Route path="resources" element={<Resources />} />
-            <Route path="emergency" element={<Emergency />} />
-            <Route path="disease" element={<Disease />} />
-             {/* <Route path="PatientExplorer" element={<Query />} />  */}
+          <Route path="dashboard" element={<Protect children={<Dashboard Department_list={deptList} />} />}>
+            <Route path="" element={<Protect children={<Home />} />} />
+            <Route path="labs" element={<Protect children={<Labs />} />} />
+            <Route path="resources" element={<Protect children={<Resources />} />} />
+            <Route path="emergency" element={<Protect children={<Emergency />} />} />
+            <Route path="disease" element={<Protect children={<Disease />} />} />
+            {/* <Route path="PatientExplorer" element={<Protect children={<Query />} />} /> */}
           </Route>
         </Routes>
       </Router>

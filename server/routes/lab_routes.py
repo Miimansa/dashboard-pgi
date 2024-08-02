@@ -31,7 +31,9 @@ def lab():
     lab_data_2=fetch_lab_data_2(date_from, date_to, department_names, grouping_type)
     lab_data_3=fetch_lab_data_3(date_from, date_to, department_names, grouping_type)
     # Initialize the service (assuming similar logic to fetch lab data)
-    # print(lab_data_1)
+    print(f"Labdata1 { lab_data_1}")
+
+    print(f"Labdata3 { lab_data_3}")
     # print(lab_data_2)
     lab_service = LabService(lab_data_1,lab_data_2,lab_data_3)
 

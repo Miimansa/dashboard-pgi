@@ -13,7 +13,8 @@ class LabService:
             'lab_order_count': self.get_lab_order_count(grouping_type),
             'lab_orders_by_department': self.get_lab_orders_by_department(grouping_type),
             'monthly_lab_test_counts': self.get_monthly_lab_test_counts(grouping_type),
-            'patient_count_by_department': self.get_patient_count_by_department(grouping_type)
+            'patient_count_by_department': self.get_patient_count_by_department_labtests(grouping_type),
+            'patient_count_by_total_department': self.get_patient_count_by_total_department(grouping_type)
         }
 
     def format_date(self, date, grouping_type):
@@ -105,11 +106,41 @@ class LabService:
 
         return result
 
-    def get_patient_count_by_department(self, grouping_type):
+    def get_patient_count_by_total_department(self, grouping_type):
         if self.lab_data_1.empty:
             return json.dumps({"message": "No data available"}, indent=2)
 
         df = self.lab_data_1.copy()
+        print("labtests")
+        print(df)
+        if(grouping_type=='monthly'):
+            df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m')
+        elif(grouping_type=='yearly'):
+             df['Date'] = pd.to_datetime(df['Date'], format='%Y')
+        # Group by Type and sum the Count
+        print(df)
+        grouped = df.groupby('DepartmentName')['Lab Record Count'].sum().reset_index()
+        
+        # Sort by Count in descending order
+        grouped = grouped.sort_values('Lab Record Count', ascending=False)
+        print(grouped)
+        result = [
+            {
+                "name": row['DepartmentName'],
+                "value": int(row['Lab Record Count'])
+            }
+            for _, row in grouped.iterrows()
+        ]
+
+        return result
+    
+    def get_patient_count_by_department_labtests(self, grouping_type):
+        if self.lab_data_3.empty:
+            return json.dumps({"message": "No data available"}, indent=2)
+
+        df = self.lab_data_3.copy()
+        print("total")
+        print(df)
         if(grouping_type=='monthly'):
             df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m')
         elif(grouping_type=='yearly'):
