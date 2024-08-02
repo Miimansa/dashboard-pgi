@@ -5,10 +5,11 @@ from config import Config
 import numpy as np
 
 class EmergencyServices:
-    def __init__ (self,emergency_data1,emergency_data2,emergency_data3):
+    def __init__ (self,emergency_data1,emergency_data2,emergency_data3,emergency_data4):
         self.data_1 = emergency_data1
         self.data_2 = emergency_data2
         self.data_3 = emergency_data3
+        self.data_4 = emergency_data4
 
     def custom_date_sort(date_string):
         return datetime.strptime(date_string, '%b %Y')
@@ -31,53 +32,40 @@ class EmergencyServices:
             'survivalDeathCounts': self.get_survivalDeath_Counts(grouping_type),
             'durationOfStay': self.get_durationOfStay(grouping_type),
             'genderDistribution': self.get_genderDistribution(grouping_type),
-            'totalPatientCount':self.get_totalPatient_Counts(grouping_type)
+            'totalPatientCount':self.get_totalPatient_Counts(grouping_type),
+            'label': self.get_labels()
         }
     
-    def get_uniquePatient_Counts(self,grouping_type):
-        if self.data_1.empty:
-            return json.dumps({"message": "No data available"}, indent=2)
-        dataframe = self.data_1.copy()
-        dataframe['Date'] = pd.to_datetime(dataframe['Date'])
-        dataframe = dataframe.sort_values('Date')
-        if grouping_type == 'monthly':
-                date_trunc = 'M'
-                date_format = '%Y-%m'
-        elif grouping_type == 'weekly':
-                date_trunc = 'W'
-                date_format = '%Y-%W'
-        elif grouping_type == 'yearly':
-                date_trunc = 'Y'
-                date_format = '%Y'
-        elif grouping_type == 'daily':
-                date_trunc = 'D'
-                date_format = '%Y-%m-%d'
-        else:
-                return json.dumps({"message": "Invalid grouping type"}, indent=2)
-            
-        dataframe['GroupedDate'] = dataframe['Date'].dt.to_period(date_trunc).dt.to_timestamp()
-            
-        if grouping_type == 'weekly':
-            dataframe['FormattedDate'] = dataframe['GroupedDate'].dt.strftime('%Y') + '-' + dataframe['GroupedDate'].dt.strftime('%W')
-        else:
-            dataframe['FormattedDate'] = dataframe['GroupedDate'].dt.strftime(date_format)
-    
-        grouped_df = dataframe.groupby(['FormattedDate', 'DepartmentName'])['Patient_Count'].sum().reset_index()
-        grouped_df = grouped_df.merge(dataframe[['Date', 'FormattedDate']].drop_duplicates(), on='FormattedDate')
-        
-        # Sort the grouped dataframe by the original Date
-        grouped_df = grouped_df.sort_values('Date')
-        # Format the data as required
-        result = []
-        for department in grouped_df['DepartmentName'].unique():
-            dept_data = grouped_df[grouped_df['DepartmentName'] == department]
-            result.append({
-                'x': dept_data['FormattedDate'].tolist(),
-                'y': dept_data['Patient_Count'].tolist(),
-                'name': department
-            })
-        return result
 
+    def get_uniquePatient_Counts(self,grouping_type):
+        if self.data_4.empty:
+            return json.dumps({"message": "No data available"}, indent=2)
+
+        df = self.data_4.copy()
+        if grouping_type == 'monthly':
+            df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m')
+        elif grouping_type == 'yearly':
+            df['Date'] = pd.to_datetime(df['Date'], format='%Y')
+        elif grouping_type == 'weekly':
+            df['Date'] = pd.to_datetime(df['Date'])
+            df['Date'] = df['Date'] - pd.to_timedelta(df['Date'].dt.dayofweek, unit='D')
+        
+        grouped = df.groupby(['Date', 'dept_name'])['admission_count'].sum().reset_index()
+        grouped = grouped.sort_values('Date')
+
+        departments = grouped['dept_name'].unique()
+        dates = sorted(grouped['Date'].unique())
+
+        result = []
+        for dept in departments:
+            dept_data = grouped[grouped['dept_name'] == dept]
+            result.append({
+                "x": [self.format_date(date, grouping_type) for date in dates],
+                "y": [int(dept_data[dept_data['Date'] == date]['admission_count'].sum()) if not dept_data[dept_data['Date'] == date].empty else 0 for date in dates],
+                "name": dept
+            })
+
+        return result
 
     def get_survivalDeath_Counts(self, grouping_type):
         if self.data_2.empty:
@@ -97,7 +85,8 @@ class EmergencyServices:
         grouped = grouped.sort_values('Date')
         
         result = []
-        for status in ['Death', 'Normal Discharge']:
+        for status in grouped['Discharge_Status'].unique():
+
             status_data = grouped[grouped['Discharge_Status'] == status]
             result.append({
                 "name": status,
@@ -106,10 +95,6 @@ class EmergencyServices:
             })
         
         return result
-
-
-
-
 
 
     def get_durationOfStay(self, grouping_type):
@@ -171,24 +156,41 @@ class EmergencyServices:
         
         return result
     def get_totalPatient_Counts(self, grouping_type):
-        if self.data_3.empty:
+        if self.data_4.empty:
             return json.dumps({"message": "No data available"}, indent=2)
         
-        dataframe = self.data_3.copy()
+        dataframe = self.data_4.copy()
         
         # Group by DepartmentName and sum the Patient_Count
-        grouped = dataframe.groupby('DepartmentName')['Average Hour Stay'].sum().reset_index()
+        grouped = dataframe.groupby('dept_name')['admission_count'].sum().reset_index()
         
         # Sort by Patient_Count in descending order
-        grouped = grouped.sort_values('DepartmentName', ascending=False)
+        grouped = grouped.sort_values('dept_name', ascending=False)
         
         # Prepare the final data in the required format for a pie chart
         result = [
             {
-                "name": row['DepartmentName'],
-                "value": int(row['Average Hour Stay'])
+                "name": row['dept_name'],
+                "value": int(row['admission_count'])
             }
             for _, row in grouped.iterrows()
         ]
         
         return result
+    
+    def get_labels(self):
+        result = {}
+
+        # Handle data_2
+        if isinstance(self.data_4, pd.DataFrame) and not self.data_4.empty:
+            result["admissions"] = int(self.data_4["admission_count"].sum())
+        else:
+            result["admissions"] = 0
+
+        print("Debug information:")
+        for key, value in result.items():
+            print(f"{key}: {value} (type: {type(value)})")
+
+        return result
+        
+        

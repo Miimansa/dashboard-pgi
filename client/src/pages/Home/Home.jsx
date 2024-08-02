@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, memo } from "react";
 import GroupedBarChartConn from "../Graphs/GroupedBarChartConn";
 import LineChart from "../Graphs/LineChart";
 import PieChart from "../Graphs/PieChart";
+import FactorSelector from "../Graphs/FactorSelector";
 import GroupedBarChart from "../Graphs/GroupedBarChart";
 import Styles from './Home.module.css'
 import { genderCount, genderDistribution } from '../Graphs/data/Homedata'
@@ -34,8 +35,8 @@ const Home = () => {
     const [checked, setChecked] = React.useState(true);
     const handleChange = (e) => {
         setChecked(e.target.checked);
-        if (e.target.checked) message.info("Pie chart showing data for Gender Count")
-        else message.info("Pie chart showing data for Visits vs admissions count")
+        if (e.target.checked) message.info("Visit records Filter")
+        else message.info("Pie chart showing data for Gender Count and Department wise Visit Count")
     };
     useEffect(() => {
         setThemeKey(prevKey => prevKey + 1);
@@ -174,38 +175,32 @@ const Home = () => {
                                 />
                             </div>
                             <div className={Styles.down_downchild2}>
-                                <Switch
-                                    checked={checked}
-                                    onChange={handleChange}
-                                    inputProps={{ 'aria-label': 'controlled' }}
-                                />
-                                <>
-                                    {checked ?
-                                        <FlexiblePlotlyChart
-                                            key={`chart-${themeKey}`}
-                                            data={pieChartData}
-                                            chartTitle={`Gender wise visits count${selectedBar ? ` for ${selectedBar[0].x}` : ''}`}
-                                            chartType={Userselection?.bio?.home?.genderDistribution?.SelectedType}
-                                            issmallfont={small}
-                                        />
-                                        :
-                                        <FlexiblePlotlyChart
-                                            key={`chart-${themeKey}`}
-                                            data={formatDataForPieChart(inpatient_outpatient)}
-                                            chartTitle={`Visits vs admissions count${selectedBar ? ` for ${selectedBar[0].x}` : ''}`}
-                                            chartType={Userselection?.bio?.home?.genderDistribution?.SelectedType}
-                                        />
-                                    }
-                                </>
-                                <>
-                                    <FlexiblePlotlyChart
-                                        key={`chart-${themeKey}`}
-                                        data={formatDataForPieChart(departmentWisePatients)}
-                                        chartTitle="Department wise visits count"
-                                        chartType={Userselection?.bio?.home?.departmentWisePatients?.SelectedType}
-                                    />
-                                </>
-                            </div>
+    <Switch
+        checked={checked}
+        onChange={handleChange}
+        inputProps={{ 'aria-label': 'controlled' }}
+    />
+    {checked ? (
+         <FactorSelector />
+       
+    ) : (
+        <>
+            <FlexiblePlotlyChart
+                key={`chart-${themeKey}`}
+                data={pieChartData}
+                chartTitle={`Gender wise visits count${selectedBar ? ` for ${selectedBar[0].x}` : ''}`}
+                chartType={Userselection?.bio?.home?.genderDistribution?.SelectedType}
+                issmallfont={small}
+            />
+            <FlexiblePlotlyChart
+                key={`chart-${themeKey}`}
+                data={formatDataForPieChart(departmentWisePatients)}
+                chartTitle="Department wise visits count"
+                chartType={Userselection?.bio?.home?.departmentWisePatients?.SelectedType}
+            />
+        </>
+    )}
+</div>
                         </div>
                     </div>
                 </div>}

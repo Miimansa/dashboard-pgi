@@ -115,7 +115,7 @@
 }
 
 .scrollable {
-  max-height: 300px;
+  max-height: 400px;
   overflow-y: scroll;
   width: 100%;
   overflow-x: hidden;

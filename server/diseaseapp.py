@@ -152,7 +152,7 @@ def get_infoid_records():
         cur = conn.cursor()
         info_id = request.args.get('info_id')
         if info_id:
-            cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = %s;", (info_id,))
+            cur.execute("SELECT * FROM patient_counts_disease WHERE info_id = %s ORDER BY sr_no DESC;", (info_id,))
             records = cur.fetchall()
         else:
             records = []

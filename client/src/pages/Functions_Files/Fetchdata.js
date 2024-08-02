@@ -1,9 +1,24 @@
 import axios from "axios";
-import { homedata_url, get_dept_url, signup_url, opt_url, login_url, resend_opt_url, update_user_url, update_usertheme_url, validuser_url, labdata_url, resources_url, emergency_url, disease_url, get_test_type_url, request_pass_url, verify_request_url, changepass_url,newPassword_url } from "./API";
+import { get_visit_url,get_discharge_type_url,homedata_url, get_dept_url, signup_url, opt_url, login_url, resend_opt_url, update_user_url, update_usertheme_url, validuser_url, labdata_url, resources_url, emergency_url, disease_url, get_test_type_url, request_pass_url, verify_request_url, changepass_url,newPassword_url } from "./API";
 
 // Function to get home data through axios
 const getdata_home = async (date_from, date_to, department_names, grouping_type, token) => {
     const url = `${homedata_url}?date_from=${date_from}&date_to=${date_to}&department_names=${department_names}&grouping_type=${grouping_type}`;
+
+    try {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+
+        };
+        const response = await axios.get(url, { headers });
+        return response;
+    } catch (error) {
+        console.error('Error in fetching data:', error);
+    }
+};
+const getMultiData = async (date_from, date_to, departments, genders,visitTypes, factor,grouping_type,token) => {
+    const url = `${get_visit_url}?date_from=${date_from}&date_to=${date_to}&departments=${departments}&genders=${genders}&visitTypes=${visitTypes}&factor=${factor}&grouping_type=${grouping_type}`;
 
     try {
         const headers = {
@@ -156,8 +171,8 @@ const getdata_resources = async (date_from, date_to, department_names, grouping_
     }
 };
 // getting data for emergency
-const getdata_emergency = async (date_from, date_to, department_names, grouping_type, token) => {
-    const url = `${emergency_url}?date_from=${date_from}&date_to=${date_to}&department_names=${department_names}&grouping_type=${grouping_type}`;
+const getdata_emergency = async (date_from, date_to, department_names, grouping_type, token,type) => {
+    const url = `${emergency_url}?date_from=${date_from}&date_to=${date_to}&department_names=${department_names}&grouping_type=${grouping_type}&type=${type}`;
 
     try {
         const headers = {
@@ -187,6 +202,19 @@ const getdata_disease = async (date_from, date_to, department_names, grouping_ty
 };
 const gettypes_test = async (token) => {
     const url = `${get_test_type_url}`;
+    try {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+        const response = await axios.get(url, { headers });
+        return response;
+    } catch (error) {
+        console.error('Error in fetching data:', error);
+    }
+}
+const getDischargeType = async (token) => {
+    const url = `${get_discharge_type_url}`;
     try {
         const headers = {
             'Content-Type': 'application/json',
@@ -261,4 +289,4 @@ const changeNewPassword = async (email, oldPassword, newPassword) => {
     }
 };
 
-export { changePassword, requestVerify, requestResetPassword, gettypes_test, getdata_disease, getdata_emergency, getdata_resources, getdata_home, getDeptList, registerUser, verifyotp, resendOtp, loginUser, updateUser, updateUserTheme, validUser, getdata_lab,changeNewPassword }
+export { getMultiData,getDischargeType,changePassword, requestVerify, requestResetPassword, gettypes_test, getdata_disease, getdata_emergency, getdata_resources, getdata_home, getDeptList, registerUser, verifyotp, resendOtp, loginUser, updateUser, updateUserTheme, validUser, getdata_lab,changeNewPassword }

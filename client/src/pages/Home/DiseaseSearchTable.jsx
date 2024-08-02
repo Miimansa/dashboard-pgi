@@ -94,6 +94,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function DiseaseSearchTable() {
+  const [isLoading, setIsLoading] = useState(false);
   const classes = useStyles();
 
   const [latestRecords, setLatestRecords] = useState([]);
@@ -290,12 +291,21 @@ function DiseaseSearchTable() {
     console.log(showAdditionConfirmation) // Close delete confirmation popup
   };
   const handleProceed = async () => {
-    const { shortDesc, dateFrom, dateTo, diseaseNames } = formData;
-    await insertRecord(shortDesc, dateFrom, dateTo, diseaseNames);
-    setShowModal(false);
-    setRecordType('infoid');
-    console.log(latestRecords);
-    console.log(maxSrNo);
+    setIsLoading(true); // Set loading to true when the function starts
+    
+    try {
+      const { shortDesc, dateFrom, dateTo, diseaseNames } = formData;
+      await insertRecord(shortDesc, dateFrom, dateTo, diseaseNames);
+      setShowModal(false);
+      setRecordType('infoid');
+      console.log(latestRecords);
+      console.log(maxSrNo);
+    } catch (error) {
+      console.error("Error in handleProceed:", error);
+      
+    } finally {
+      setIsLoading(false); 
+    }
   };
   const updateShortDesc = (updatedShortDesc) => {
     setFormData((prevFormData) => ({
@@ -708,14 +718,15 @@ function DiseaseSearchTable() {
             />
           </form>
           <div>
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              onClick={handleProceed}
-            >
-              Proceed
-            </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={handleProceed}
+            disabled={isLoading} // Disable the button when loading
+          >
+            {isLoading ? 'Processing...' : 'Proceed'} 
+          </Button>
             <Button
               variant="contained"
               color="secondary"
