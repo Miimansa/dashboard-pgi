@@ -62,9 +62,9 @@ const Resources = () => {
             :
             <div className={Styles.cont}>
                 <div className={Styles.up}>
-                    <p className={Styles.up_count}>OT: {data?.labels?.OTCount}</p>
+                    <p className={Styles.up_count}>OT Requests: {data?.labels?.OTCount}</p>
                     <p className={Styles.up_count}>Blood Packets: {data?.labels?.blood_count}</p>
-                    <p className={Styles.up_count}>Beds: {data?.labels?.Beds}</p>
+                   
                 </div>
                 <div className={Styles.down}>
                     <div className={Styles.down_up}>
