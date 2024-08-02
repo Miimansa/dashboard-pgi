@@ -209,4 +209,4 @@ def execute_query(query, params):
 
 if __name__ == '__main__':
     port = int(os.getenv('QUERRY_SERVER_PORT', 7655))  # Use 7655 as default if the env variable is not set
-    app.run(port=port, debug=True)
+    app.run(port=port,host='0.0.0.0', debug=True)

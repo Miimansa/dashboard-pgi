@@ -107,9 +107,9 @@ useEffect(() => {
                         <div className={Styles.down_upchild}>
                             <FlexiblePlotlyChart data={data?.uniquePatientCounts}
                                 key={`chart-${themeKey}`}
-                                chartTitle={"Department wise Patient count"}
+                                chartTitle={"Department wise Admissions count"}
                                 xAxisTitle={"Date"}
-                                yAxisTitle={"Patient counts"}
+                                yAxisTitle={"Admissions counts"}
                                 chartType={Userselection?.bio?.emergency?.uniquePatientCounts?.SelectedType}
                             // chartType={"groupedBar"}
                             />
@@ -149,7 +149,7 @@ useEffect(() => {
                              <FlexiblePlotlyChart
                                 key={`chart-${themeKey}`}
                                 data={data?.survivalDeathCounts}
-                                chartTitle="Discharge : normal / death"
+                                chartTitle="Discharge Status"
                                 xAxisTitle="Time"
                                 yAxisTitle="Patient count"
                                 chartType={Userselection?.bio?.emergency?.survivalDeathCounts?.SelectedType}
@@ -160,7 +160,7 @@ useEffect(() => {
                             <FlexiblePlotlyChart
                                 key={`chart-${themeKey}`}
                                 data={formatDataForPieChart(data?.genderDistribution)}
-                                chartTitle="Discharge : normal / death"
+                                chartTitle="Discharge Status"
                                 chartType={Userselection?.bio?.emergency?.genderDistribution?.SelectedType}
                             // chartType={"pie"}
                             />

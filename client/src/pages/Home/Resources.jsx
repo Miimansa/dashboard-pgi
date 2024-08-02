@@ -72,7 +72,7 @@ const Resources = () => {
                             <FlexiblePlotlyChart data={data?.bloodUsedByDepartment}
                                 xAxisTitle={"Date"}
                                 yAxisTitle={"Blood Packets"}
-                                chartTitle={"Department wise blood patients count"}
+                                chartTitle={"Department wise Blood Packets count"}
                                 chartType={Userselection?.bio?.resources?.bloodUsedByDepartment?.SelectedType}
                             // chartType={'line'}
                             />
@@ -80,7 +80,7 @@ const Resources = () => {
                         <div className={Styles.down_upchild}>
                             {/* <FlexiblePlotlyChart
                                 data={data?.OxygencylinderByDepartment}
-                                chartTitle="Department wise oxygen cylinder count"
+                                chartTitle="Department wise Oxygen cylinder count"
                                 xAxisTitle="Date"
                                 yAxisTitle="cylinders"
                                 chartType={Userselection?.bio?.resources?.OxygencylinderByDepartment?.SelectedType}
@@ -96,7 +96,7 @@ const Resources = () => {
                         <div className={Styles.down_downchild1}>
                             <FlexiblePlotlyChart
                                 data={data?.operationTheaterOccupancyByDepartment}
-                                chartTitle="Department wise  OT request"
+                                chartTitle="Department wise  OT Requests"
                                 xAxisTitle="Date"
                                 yAxisTitle="Request Counts"
                                 // chartType={'line'}

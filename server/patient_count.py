@@ -97,6 +97,6 @@ def execute_query(query):
 if __name__ == '__main__':
     try:
         port = int(os.getenv('PATIENT_COUNT_PORT', 7657))
-        app.run(port=port, debug=True)
+        app.run(port=port, debug=True,host='0.0.0.0')
     except Exception as e:
         print(f"Error starting the application: {str(e)}")

@@ -315,4 +315,4 @@ def update_patient_counts_disease(id):
 
 if __name__ == '__main__':
     port = int(env_vars.get('REACT_APP_DISEASE_APP_PORT', 5354))
-    app.run(port=port, debug=True)
+    app.run(port=port, debug=True,host='0.0.0.0')

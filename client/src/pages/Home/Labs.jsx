@@ -142,7 +142,7 @@ const Labs = () => {
                         <div className={Styles.down_downchild1}>
                             <FlexiblePlotlyChart data={data?.monthly_lab_test_counts}
                                 key={`chart-${themeKey}`}
-                                chartTitle="Lab test types count"
+                                chartTitle="Lab Test types count"
                                 xAxisTitle="Time"
                                 yAxisTitle="Count"
                                 // chartType={"line"}
