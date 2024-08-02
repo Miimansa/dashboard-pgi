@@ -109,8 +109,7 @@ class EmergencyServices:
         dataframe = dataframe.sort_values('Date')
         
         # Group by the formatted date and department name, then calculate the average stay
-        grouped = dataframe.groupby(['FormattedDate', 'DepartmentName'])['Average Hour Stay'].mean().reset_index()
-        
+        grouped = dataframe.groupby(['FormattedDate', 'DepartmentName'])['Average Hour Stay'].first().reset_index()        
         # Merge with the original dataframe to get the Date for sorting
         grouped = grouped.merge(dataframe[['Date', 'FormattedDate']].drop_duplicates(), on='FormattedDate')
         
