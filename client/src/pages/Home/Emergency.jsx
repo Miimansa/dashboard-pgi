@@ -151,7 +151,7 @@ const Emergency = () => {
                             value={type}
                         />
                         <button onClick={handleType}>Reload</button>
-                        <button onClick={handleSetDefault}>Set</button>
+                        <button onClick={handleSetDefault}>Set</button> 
                     </div>
                     <div className={Styles.down_down}>
                         <div className={Styles.down_downchild1}>
