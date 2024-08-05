@@ -4,17 +4,32 @@ import re
 import datetime
 
 
+from sqlalchemy.dialects.postgresql import JSONB
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     full_name = db.Column(db.String(120))
-    bio = db.Column(db.JSON)
+    bio = db.Column(db.Text)
     otp = db.Column(db.String(6))
     otp_expiry = db.Column(db.DateTime)
     is_verified = db.Column(db.Boolean, default=False)
-    theme = db.Column(db.String(20), default='default')
+    theme = db.Column(db.String(50), default='default')
+    default_departments = db.Column(JSONB, default=[
+        "Surgical Gastroenterology",
+        "Paediatric Gastroenterology",
+        "Gastroenterology",
+        "Hematology",
+        "Hepatology"
+    ])
+    default_labtypes = db.Column(JSONB, default=[])
+    default_dischargestatus = db.Column(JSONB, default=[
+        "Death",
+        "Normal Discharge"
+    ])
+
 
     def set_otp(self, otp):
         self.otp = otp

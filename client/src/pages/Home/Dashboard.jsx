@@ -11,6 +11,8 @@ import { FaFlask, FaSearchPlus, FaTools, FaEdit } from "react-icons/fa";
 import { BsPatchQuestionFill } from "react-icons/bs";
 import { BiSolidBellPlus } from "react-icons/bi";
 import DatePicker from "react-datepicker";
+import { getDefaultValues } from "../Functions_Files/Fetchdata";
+
 import "react-datepicker/dist/react-datepicker.css";
 import { IoArrowBackOutline, IoArrowForwardOutline, IoBody } from "react-icons/io5";
 import { MdOutlineZoomInMap, MdZoomOutMap } from "react-icons/md";
@@ -22,7 +24,7 @@ import { message } from "antd";
 
 const Dashboard = ({ Department_list }) => {
     const dispatch = useDispatch();
-
+    const token = useSelector((state) => state.user.token);
     // states for filters
     const [group_in, setGroup_in] = useState(option_groups[1]);
     console.log(group_in)
@@ -96,29 +98,64 @@ const Dashboard = ({ Department_list }) => {
         dispatch(setFrom_date(fromDateFormatted));
         dispatch(setTo_date(toDateFormatted));
         dispatch(setGroup(group_in?.name));
-        const selectedValues = department_in.map(option => option.label);
-        const departments = selectedValues.join(", ");
-        dispatch(setDepartment(departments));
+        
+        // Check if department_in is an array (multiple selections) or a single object
+        const selectedDepartments = Array.isArray(department_in) 
+            ? department_in.map(option => option.value).join(", ")
+            : department_in ? department_in.value : "";
+        
+        dispatch(setDepartment(selectedDepartments));
         searchonClick();
     }
-
     // getting data from store
     const department_store = useSelector((state) => state.filter.department);
 
     // adding all department list to usestate
     const [op_dept, setOp_dept] = useState();
     useEffect(() => {
-        //setting department list 
-        if (Department_list) {
-            // Map Department_list to options format
-            const options = Department_list.map((item) => ({
-                label: item,
-                value: item
-            }));
-            setDepartment_in(options);
-            setOp_dept(options);
-        }
-    }, [Department_list])
+        const loadData = async () => {
+            try {
+                // Get default values
+                const defaultValues = await getDefaultValues(token);
+                
+                if (Department_list) {
+                    // Map Department_list to options format
+                    const allDepartments = Department_list.map((item) => ({
+                        label: item,
+                        value: item
+                    }));
+                    setOp_dept(allDepartments);
+
+                    // Set default departments if available, otherwise use all departments
+                    if (defaultValues.default_departments && defaultValues.default_departments.length > 0) {
+                        console.log(defaultValues)
+                        const defaultDepts = defaultValues.default_departments.map(dept => ({
+                            label: dept,
+                            value: dept
+                        }));
+                        setDepartment_in(defaultDepts);
+
+                    } else {
+                        setDepartment_in(allDepartments);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading default values:', error);
+                // Fallback to using all departments if there's an error
+                if (Department_list) {
+                    const allDepartments = Department_list.map((item) => ({
+                        label: item,
+                        value: item
+                    }));
+                    setDepartment_in(allDepartments);
+                    setOp_dept(allDepartments);
+                }
+            }
+        };
+
+        loadData();
+    }, [Department_list, token]);
+
     // for loading animation
     const loading = useSelector((state => state.filter.loading))
     const theme = useSelector((state => state.user.user.theme))
@@ -304,13 +341,13 @@ const Dashboard = ({ Department_list }) => {
                                         </div>
 
                                         <div className={Styles.multi_select}>
-                                            <Select
+                                        <Select
                                                 options={op_dept}
                                                 placeholder="Select Department..."
                                                 onChange={setDepartment_in}
                                                 styles={colourStyles}
                                                 isMulti
-                                                defaultValue={department_in}
+                                                value={department_in}
                                             />
                                         </div>
                                         <div className={Styles.search_button}>

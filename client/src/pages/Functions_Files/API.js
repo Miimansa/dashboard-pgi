@@ -18,5 +18,8 @@ export const changepass_url = process.env.REACT_APP_BACKEND_URL + 'auth/reset-pa
 export const newPassword_url = process.env.REACT_APP_BACKEND_URL + 'auth/new-password'
 export const get_discharge_type_url = process.env.REACT_APP_BACKEND_URL + 'emergency/get_dischargeType'
 export const get_visit_url = process.env.REACT_APP_BACKEND_URL + 'home/get_visit'
+export const update_default_values = process.env.REACT_APP_BACKEND_URL + 'auth/update-default-values'
+export const get_default_values = process.env.REACT_APP_BACKEND_URL + 'auth/get-default-values'
+
 
 

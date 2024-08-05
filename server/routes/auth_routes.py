@@ -342,3 +342,60 @@ def handle_exception(e):
     # Log the error here (e.g., using app.logger.error(str(e)))
     print(e)
     return jsonify({"message": "An unexpected error occurred"}), 500
+
+
+
+@auth_bp.route('/update-default-values', methods=['POST'])
+@jwt_required()
+def update_default_values():
+    if not request.is_json:
+        return jsonify({"message": "Request must be JSON"}), 415
+
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    print(request.get_json())
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    try:
+        update_data = request.get_json()
+
+        if 'default_departments' in update_data:
+            user.default_departments = update_data['default_departments']
+
+        if 'default_labtypes' in update_data:
+            user.default_labtypes = update_data['default_labtypes']
+
+        if 'default_dischargestatus' in update_data:
+            user.default_dischargestatus = update_data['default_dischargestatus']
+
+        db.session.commit()
+
+        return jsonify({"message": "Default values updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        print(f"Error updating default values: {str(e)}")
+        return jsonify({"message": "An error occurred while updating default values {e}"}), 500
+    
+
+@auth_bp.route('/get-default-values', methods=['GET'])
+@jwt_required()
+def get_default_values():
+    current_user_id = get_jwt_identity()
+    print(current_user_id)
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    try:
+        default_values = {
+            "default_departments": user.default_departments,
+            "default_labtypes": user.default_labtypes,
+            "default_dischargestatus": user.default_dischargestatus
+        }
+        return jsonify(default_values), 200
+    except Exception as e:
+        print(f"Error retrieving default values: {str(e)}")
+        return jsonify({"message": "An error occurred while retrieving default values"}), 500

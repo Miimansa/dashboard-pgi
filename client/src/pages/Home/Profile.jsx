@@ -5,6 +5,7 @@ import IMG from '../../assets/user.png';
 import Graphfilter from './filters/Graphfilter';
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
+import DefaultDepartments from './DefaultDepartments';
 import { changeNewPassword } from '../Functions_Files/Fetchdata';
 import { message } from 'antd';
 const Profile = () => {
@@ -127,7 +128,9 @@ const Profile = () => {
                         </div>
                     </form>
                 )}
+                 <DefaultDepartments />
             </div>
+
             <div className={styles.rightDiv}>
                 <Graphfilter />
             </div>

@@ -1,11 +1,10 @@
 import React from "react";
-
 import { useState, useEffect } from "react";
 import Styles from './Labs.module.css'
 import FlexiblePlotlyChart from "../Graphs/FlexibleChart";
 import { useDispatch, useSelector } from "react-redux";
 import { setloading_text } from "../../state/filtersSlice";
-import { getdata_lab, gettypes_test } from "../Functions_Files/Fetchdata";
+import { getdata_lab, gettypes_test, updateDefaultValues, getDefaultValues } from "../Functions_Files/Fetchdata";
 import ClipLoader from "react-spinners/ClipLoader";
 import { formatDataForPieChart } from "../Functions_Files/file_functions";
 import { colourStyles } from "../Functions_Files/filters_data";
@@ -14,56 +13,47 @@ import Switch from '@mui/material/Switch';
 import { message } from "antd";
 
 const Labs = () => {
-    const loadSelectedTests = () => {
-        const savedTests = localStorage.getItem('selectedLabTests');
-        return savedTests ? JSON.parse(savedTests) : [null];
-      };
-    const currentTheme = useSelector((state) => state.graph.currentTheme);
-    const [themeKey, setThemeKey] = useState(0);
     const [typetest, settypetest] = useState([]);
-    const [type, setType] = useState(() => {
-        const savedTests = loadSelectedTests();
-        return savedTests || ['initial'];
-      });
+    const [type, setType] = useState([]);
     const [type_string, settype_string] = useState();
     const [checked, setChecked] = React.useState(true);
+    const [loading, setloading] = useState(true);
+    const [data, setdata] = useState(null);
+
+    const currentTheme = useSelector((state) => state.graph.currentTheme);
+    const [themeKey, setThemeKey] = useState(0);
+    const Userselection = useSelector((state) => state.user.user);
+    const from_date = useSelector((state) => state.filter.from_date || '').replace(/\//g, '-');
+    const to_date = useSelector((state) => state.filter.to_date || '').replace(/\//g, '-');
+    const group = useSelector((state) => state.filter.group);
+    const department = useSelector((state) => state.filter.department) || '';
+    const token = useSelector((state) => state.user.token);
+    const theme = useSelector((state => state.user.user.theme));
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        setThemeKey(prevKey => prevKey + 1);
+    }, [currentTheme]);
+
     const handleChange = (e) => {
         setChecked(e.target.checked);
         if (e.target.checked) message.info("Pie chart showing data for Gender Count")
         else message.info("Pie chart showing data for Visits vs admissions count")
     };
+
     const changetypeformat = (data) => {
         const formattedType = data.map(item => ({
           label: item,
           value: item
         }));
         settypetest(formattedType);
-        
-        const savedTests = loadSelectedTests();
-        if (savedTests) {
-          setType(savedTests);
-        } else if (type[0] === 'initial') {
-          setType(formattedType.slice(0, 5));
-        }
-      };
+    };
+
     const handleType = () => {
         const typeString = type.map((item) => item.label).toString();
         settype_string(typeString);
-        saveSelectedTests(type);
-      };
-    useEffect(() => {
-        setThemeKey(prevKey => prevKey + 1);
-    }, [currentTheme]);
-    const Userselection = useSelector((state) => state.user.user);
-    console.log(Userselection)
-    //fetching data 
-    const from_date = useSelector((state) => state.filter.from_date || '').replace(/\//g, '-');
-    const to_date = useSelector((state) => state.filter.to_date || '').replace(/\//g, '-');
-    const group = useSelector((state) => state.filter.group);
-    const department = useSelector((state) => state.filter.department) || '';
-    const token = useSelector((state) => state.user.token);
-    const [data, setdata] = useState(null);
-    const dispatch = useDispatch();
+    };
+
     const fetchData = async () => {
         dispatch(setloading_text(true))
         setloading(true)
@@ -79,17 +69,40 @@ const Labs = () => {
         }
         dispatch(setloading_text(false))
     };
-
     useEffect(() => {
         fetchData();
     }, [department, group, from_date, to_date, type_string]);
-    const [loading, setloading] = useState(true);
-    const theme = useSelector((state => state.user.user.theme))
-    const saveSelectedTests = (tests) => {
-        localStorage.setItem('selectedLabTests', JSON.stringify(tests));
-      };
-      
-      
+    const loadDefaultValues = async () => {
+        try {
+            const defaultValues = await getDefaultValues(token);
+            if (defaultValues.default_labtypes) {
+                const defaultLabTypes = defaultValues.default_labtypes.map(item => ({
+                    label: item,
+                    value: item
+                }));
+                setType(defaultLabTypes);
+                console.log(defaultLabTypes);
+            }
+        } catch (error) {
+            console.error('Error loading default values:', error);
+            message.error("Failed to load default lab types");
+        }
+    };
+
+    useEffect(() => {
+        loadDefaultValues();
+    }, [token]);
+
+    const handleSetDefault = async () => {
+        try {
+            const defaultLabTypes = type.map(item => item.value);
+            await updateDefaultValues(token, { default_labtypes: defaultLabTypes });
+            message.success("Default lab types updated successfully");
+        } catch (error) {
+            console.error('Error setting default values:', error);
+            message.error("Failed to update default lab types");
+        }
+    };
     return (<>
         {loading ?
             <div className={Styles.cont_preloader}>
@@ -127,7 +140,6 @@ const Labs = () => {
                     <Select
                         onChange={(selectedOptions) => {
                             setType(selectedOptions);
-                            saveSelectedTests(selectedOptions);
                         }}
                         className={Styles.multi_select_in}
                         placeholder="Select disease type..."
@@ -135,9 +147,11 @@ const Labs = () => {
                         isMulti
                         options={typetest}
                         value={type}
-                        />
-                        <button onClick={handleType}>Reload</button>
-                    </div>
+                    />
+                    <button onClick={handleType}>Reload</button>
+                    <button onClick={handleSetDefault}>Set</button>
+                </div>
+                        
                     <div className={Styles.down_down}>
                         <div className={Styles.down_downchild1}>
                             <FlexiblePlotlyChart data={data?.monthly_lab_test_counts}

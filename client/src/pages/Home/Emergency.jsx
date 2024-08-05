@@ -4,62 +4,51 @@ import PieChart from "../Graphs/PieChart";
 import GroupedBarChart from "../Graphs/GroupedBarChart";
 import LineChart from "../Graphs/LineChart";
 import FlexiblePlotlyChart from "../Graphs/FlexibleChart";
-import { uniquePatientCounts, survivalDeathCounts, durationOfStay, genderDistribution, totalPatientCount } from "../Graphs/data/emergencydata";
 import Styles from './Emergency.module.css'
 import ClipLoader from "react-spinners/ClipLoader";
 import { useDispatch, useSelector } from 'react-redux';
 import { setloading_text } from "../../state/filtersSlice";
-import { getdata_emergency } from "../Functions_Files/Fetchdata";
+import { getdata_emergency, getDischargeType, updateDefaultValues, getDefaultValues } from "../Functions_Files/Fetchdata";
 import { formatDataForPieChart } from "../Functions_Files/file_functions";
 import Select from 'react-select';
 import { colourStyles } from "../Functions_Files/filters_data";
-import { getDischargeType } from "../Functions_Files/Fetchdata";
+import { message } from "antd";
+
 const Emergency = () => {
+    const [typeEmergency, setTypeEmergency] = useState([]);
+    const [type, setType] = useState([]);
+    const [typeString, setTypeString] = useState('');
+    const [loading, setloading] = useState(true);
+    const [data, setdata] = useState(null);
+
     const currentTheme = useSelector((state) => state.graph.currentTheme);
     const [themeKey, setThemeKey] = useState(0);
-    useEffect(() => {
-        setThemeKey(prevKey => prevKey + 1);
-    }, [currentTheme]);
     const Userselection = useSelector((state) => state.user.user);
-    console.log(Userselection)
-    // console.log(Userselection?.bio?.Emergency?.uniquePatientCounts?.SelectedType)
-
-    //fetching data 
     const from_date = useSelector((state) => state.filter.from_date || '').replace(/\//g, '-');
     const to_date = useSelector((state) => state.filter.to_date || '').replace(/\//g, '-');
     const group = useSelector((state) => state.filter.group);
     const department = useSelector((state) => state.filter.department) || '';
     const token = useSelector((state) => state.user.token);
-    const [data, setdata] = useState(null);
+    const theme = useSelector((state => state.user.user.theme));
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        setThemeKey(prevKey => prevKey + 1);
+    }, [currentTheme]);
+
     const changeTypeFormat = (data) => {
         const formattedType = data.map(item => ({
             label: item,
             value: item
         }));
         setTypeEmergency(formattedType);
-        
-        const savedTypes = loadSelectedTypes();
-        if (savedTypes) {
-            setType(savedTypes);
-        } else if (type[0] === 'initial') {
-            console.log(formattedType.slice(0, 5))
-            setType([
-                { value: 'Death', label: 'Death' },
-                { value: 'Normal Discharge', label: 'Normal Discharge' }
-            ]);
-        }
     };
-    
+
     const handleType = () => {
         const typeStr = type.map((item) => item.label).toString();
         setTypeString(typeStr);
-        saveSelectedTypes(type);
     };
-    
-    const saveSelectedTypes = (types) => {
-        localStorage.setItem('selectedEmergencyTypes', JSON.stringify(types));
-    };
+
     const fetchData = async () => {
         dispatch(setloading_text(true))
         setloading(true)
@@ -75,23 +64,45 @@ const Emergency = () => {
         }
         dispatch(setloading_text(false))
     };
-    const loadSelectedTypes = () => {
-        const savedTypes = localStorage.getItem('selectedEmergencyTypes');
-        return savedTypes ? JSON.parse(savedTypes) : null;
+
+    const loadDefaultValues = async () => {
+        try {
+            const defaultValues = await getDefaultValues(token);
+            if (defaultValues.default_dischargestatus) {
+                const defaultDischargeStatus = defaultValues.default_dischargestatus.map(item => ({
+                    label: item,
+                    value: item
+                }));
+                setType(defaultDischargeStatus);
+                setTypeString(defaultDischargeStatus.map(item => item.label).join(','));
+            }
+        } catch (error) {
+            console.error('Error loading default values:', error);
+            message.error("Failed to load default discharge status");
+        }
     };
-    const [typeEmergency, setTypeEmergency] = useState([]);
-const [type, setType] = useState(() => {
-    const savedTypes = loadSelectedTypes();
-    return savedTypes || ['initial'];
-});
-const [typeString, setTypeString] = useState(['Normal Discharge','Death']);
-useEffect(() => {
-    fetchData();
-}, [department, group, from_date, to_date, typeString]);
-    const [loading, setloading] = useState(true);
-    const theme = useSelector((state => state.user.user.theme))
+
+    useEffect(() => {
+        loadDefaultValues();
+    }, [token]);
+
+    useEffect(() => {
+        fetchData();
+    }, [department, group, from_date, to_date, typeString]);
+
+    const handleSetDefault = async () => {
+        try {
+            const defaultDischargeStatus = type.map(item => item.value);
+            await updateDefaultValues(token, { default_dischargestatus: defaultDischargeStatus });
+            message.success("Default discharge status updated successfully");
+        } catch (error) {
+            console.error('Error setting default values:', error);
+            message.error("Failed to update default discharge status");
+        }
+    };
+
     const admissioncount = data?.label.admissions || 0;
-    console.log(data)
+
     return (<>
         {loading ?
             <div className={Styles.cont_preloader}>
@@ -128,20 +139,20 @@ useEffect(() => {
                         </div>
                     </div>
                     <div className={Styles.multi_select}>
-                                <Select
-                                    onChange={(selectedOptions) => {
-                                        setType(selectedOptions);
-                                        saveSelectedTypes(selectedOptions);
-                                    }}
-                                    className={Styles.multi_select_in}
-                                    placeholder="Select emergency type..."
-                                    styles={colourStyles}
-                                    isMulti
-                                    options={typeEmergency}
-                                    value={type}
-                                />
-                                <button onClick={handleType}>Reload</button>
-                            </div>
+                        <Select
+                            onChange={(selectedOptions) => {
+                                setType(selectedOptions);
+                            }}
+                            className={Styles.multi_select_in}
+                            placeholder="Select discharge status..."
+                            styles={colourStyles}
+                            isMulti
+                            options={typeEmergency}
+                            value={type}
+                        />
+                        <button onClick={handleType}>Reload</button>
+                        <button onClick={handleSetDefault}>Set</button>
+                    </div>
                     <div className={Styles.down_down}>
                         <div className={Styles.down_downchild1}>
                             {/* // this raph will turn to heatmap when single */}
