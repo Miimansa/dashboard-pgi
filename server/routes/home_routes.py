@@ -93,10 +93,15 @@ def get_visit():
         date_trunc = 'month'
         date_format = '%b %Y'
         query = f"""
-            SELECT *
-            FROM mv_table_monthly
-            WHERE TO_DATE(mv_table_monthly.dateData, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')
-              AND TO_DATE(mv_table_monthly.dateData, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
+select mv_dash_home_pie_monthly.data_month
+	, hisdepartment.department_name as dept_name
+	, mv_dash_home_pie_monthly.gender
+	, mv_dash_home_pie_monthly.visit_type
+	, mv_dash_home_pie_monthly.visit_count
+from mv_dash_home_pie_monthly 
+inner join hisdepartment on mv_dash_home_pie_monthly.depid = hisdepartment.department_id
+            WHERE TO_DATE(mv_dash_home_pie_monthly.data_month, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')
+              AND TO_DATE(mv_dash_home_pie_monthly.data_month, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
         """
     elif grouping_type == 'weekly':
         date_trunc = 'week'
@@ -130,7 +135,7 @@ def get_visit():
         params = [date_from, date_to]
 
         if departments:
-            query += " AND Department IN %s"
+            query += " AND hisdepartment.department_name IN %s"
             params.append(tuple(departments.split(',')))
 
         if genders:

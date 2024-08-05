@@ -21,7 +21,7 @@ const FactorSelector = () => {
   const departments = department ? department.split(',').map(d => d.trim()) : [];
   const [loading, setLoading] = useState(false);
   const [selectedDepartments, setSelectedDepartments] = useState(departments);
-  const [selectedGenders, setSelectedGenders] = useState(['M', 'F', 'Others']);
+  const [selectedGenders, setSelectedGenders] = useState(['M', 'F', 'O']);
   const [selectedVisitTypes, setSelectedVisitTypes] = useState(['IP', 'OP']);
   const [factor, setFactor] = useState('department');
   const [pieChartData, setPieChartData] = useState([]);
@@ -49,7 +49,7 @@ const FactorSelector = () => {
 
   const handleReset = () => {
     setSelectedDepartments(departments);
-    setSelectedGenders(['M', 'F', 'Others']);
+    setSelectedGenders(['M', 'F', 'O']);
     setSelectedVisitTypes(['IP', 'OP']);
     setFactor('department');
   };
@@ -135,7 +135,7 @@ const FactorSelector = () => {
           >
             <Option value="M">Male</Option>
             <Option value="F">Female</Option>
-            <Option value="Others">Others</Option>
+            <Option value="O">Others</Option>
           </Select>
         </div>
 
