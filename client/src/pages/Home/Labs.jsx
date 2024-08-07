@@ -60,6 +60,7 @@ const Labs = () => {
         const typeString = type.map((item) => item.label).toString();
         settype_string(typeString);
         setSessionLabTypes(type.map(item => item.label));
+
     };
     
     useEffect(() => {
@@ -191,7 +192,7 @@ const Labs = () => {
                         value={type}
                     />
                     <button onClick={handleType}>Reload</button>
-                    <button onClick={handleSetDefault}>Set</button>
+                    <button onClick={handleSetDefault}>Save</button>
                 </div>
                         
                     <div className={Styles.down_down}>
