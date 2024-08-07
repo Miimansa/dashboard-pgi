@@ -40,7 +40,14 @@ const Labs = () => {
         if (e.target.checked) message.info("Pie chart showing data for Gender Count")
         else message.info("Pie chart showing data for Visits vs admissions count")
     };
-
+    const setSessionLabTypes = (types) => {
+        localStorage.setItem('labTypes', JSON.stringify(types));
+    };
+    
+    const getSessionLabTypes = () => {
+        const types = localStorage.getItem('labTypes');
+        return types ? JSON.parse(types) : null;
+    };
     const changetypeformat = (data) => {
         const formattedType = data.map(item => ({
           label: item,
@@ -52,13 +59,29 @@ const Labs = () => {
     const handleType = () => {
         const typeString = type.map((item) => item.label).toString();
         settype_string(typeString);
+        setSessionLabTypes(type.map(item => item.label));
     };
+    
+    useEffect(() => {
+        fetchData(true);
+    }, []);
+    
+    useEffect(() => {
+        if (type_string !== undefined) {
+            fetchData();
+        }
+    }, [department, group, from_date, to_date, type_string]);
 
-    const fetchData = async () => {
+    const fetchData = async (initialLoad = false) => {
         dispatch(setloading_text(true))
         setloading(true)
         try {
-            const res = await getdata_lab(from_date, to_date, department, group, token, type_string);
+            let currentTypeString = type_string;
+            if (initialLoad || !currentTypeString) {
+                currentTypeString = await loadDefaultValues();
+                settype_string(currentTypeString);
+            }
+            const res = await getdata_lab(from_date, to_date, department, group, token, currentTypeString);
             const res_type = await gettypes_test(token);
             changetypeformat(res_type.data);
             setdata(res.data)
@@ -69,11 +92,26 @@ const Labs = () => {
         }
         dispatch(setloading_text(false))
     };
+    
     useEffect(() => {
-        fetchData();
+        if (type_string !== undefined) {
+            fetchData();
+        }
     }, [department, group, from_date, to_date, type_string]);
     const loadDefaultValues = async () => {
         try {
+            // First, check session storage
+            const sessionTypes = getSessionLabTypes();
+            if (sessionTypes) {
+                const sessionLabTypes = sessionTypes.map(item => ({
+                    label: item,
+                    value: item
+                }));
+                setType(sessionLabTypes);
+                return sessionTypes.join(',');
+            }
+    
+            // If no session state, load default values
             const defaultValues = await getDefaultValues(token);
             if (defaultValues.default_labtypes) {
                 const defaultLabTypes = defaultValues.default_labtypes.map(item => ({
@@ -81,22 +119,26 @@ const Labs = () => {
                     value: item
                 }));
                 setType(defaultLabTypes);
-                console.log(defaultLabTypes);
+                return defaultValues.default_labtypes.join(',');
             }
+            return '';
         } catch (error) {
             console.error('Error loading default values:', error);
             message.error("Failed to load default lab types");
+            return '';
         }
     };
-
-    useEffect(() => {
-        loadDefaultValues();
-    }, [token]);
+    // useEffect(() => {
+    //     loadDefaultValues();
+    // }, [token]);
 
     const handleSetDefault = async () => {
         try {
             const defaultLabTypes = type.map(item => item.value);
             await updateDefaultValues(token, { default_labtypes: defaultLabTypes });
+            const typeString = defaultLabTypes.join(',');
+            settype_string(typeString);
+            setSessionLabTypes(defaultLabTypes);
             message.success("Default lab types updated successfully");
         } catch (error) {
             console.error('Error setting default values:', error);

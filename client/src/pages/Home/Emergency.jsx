@@ -1,9 +1,4 @@
 import React, { useEffect, useState } from "react";
-import GroupedBarChartConn from "../Graphs/GroupedBarChartConn";
-import PieChart from "../Graphs/PieChart";
-import GroupedBarChart from "../Graphs/GroupedBarChart";
-import LineChart from "../Graphs/LineChart";
-import FlexiblePlotlyChart from "../Graphs/FlexibleChart";
 import Styles from './Emergency.module.css'
 import ClipLoader from "react-spinners/ClipLoader";
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +8,17 @@ import { formatDataForPieChart } from "../Functions_Files/file_functions";
 import Select from 'react-select';
 import { colourStyles } from "../Functions_Files/filters_data";
 import { message } from "antd";
+import FlexiblePlotlyChart from "../Graphs/FlexibleChart";
+
+// Utility functions for session storage
+const setSessionDischargeStatus = (types) => {
+    localStorage.setItem('dischargeStatus', JSON.stringify(types));
+};
+
+const getSessionDischargeStatus = () => {
+    const types = localStorage.getItem('dischargeStatus');
+    return types ? JSON.parse(types) : null;
+};
 
 const Emergency = () => {
     const [typeEmergency, setTypeEmergency] = useState([]);
@@ -47,13 +53,51 @@ const Emergency = () => {
     const handleType = () => {
         const typeStr = type.map((item) => item.label).toString();
         setTypeString(typeStr);
+        setSessionDischargeStatus(type.map(item => item.label));
+        fetchData(); // Call fetchData directly here
     };
 
-    const fetchData = async () => {
+    const loadDefaultValues = async () => {
+        try {
+            // First, check session storage
+            const sessionTypes = getSessionDischargeStatus();
+            if (sessionTypes) {
+                const sessionDischargeStatus = sessionTypes.map(item => ({
+                    label: item,
+                    value: item
+                }));
+                setType(sessionDischargeStatus);
+                return sessionTypes.join(',');
+            }
+
+            // If no session state, load default values
+            const defaultValues = await getDefaultValues(token);
+            if (defaultValues.default_dischargestatus) {
+                const defaultDischargeStatus = defaultValues.default_dischargestatus.map(item => ({
+                    label: item,
+                    value: item
+                }));
+                setType(defaultDischargeStatus);
+                return defaultValues.default_dischargestatus.join(',');
+            }
+            return '';
+        } catch (error) {
+            console.error('Error loading default values:', error);
+            message.error("Failed to load default discharge status");
+            return '';
+        }
+    };
+
+    const fetchData = async (initialLoad = false) => {
         dispatch(setloading_text(true))
         setloading(true)
         try {
-            const res = await getdata_emergency(from_date, to_date, department, group, token, typeString);
+            let currentTypeString = typeString;
+            if (initialLoad || !currentTypeString) {
+                currentTypeString = await loadDefaultValues();
+                setTypeString(currentTypeString);
+            }
+            const res = await getdata_emergency(from_date, to_date, department, group, token, currentTypeString);
             const res_type = await getDischargeType(token);
             changeTypeFormat(res_type.data);
             setdata(res.data)
@@ -65,35 +109,24 @@ const Emergency = () => {
         dispatch(setloading_text(false))
     };
 
-    const loadDefaultValues = async () => {
-        try {
-            const defaultValues = await getDefaultValues(token);
-            if (defaultValues.default_dischargestatus) {
-                const defaultDischargeStatus = defaultValues.default_dischargestatus.map(item => ({
-                    label: item,
-                    value: item
-                }));
-                setType(defaultDischargeStatus);
-                setTypeString(defaultDischargeStatus.map(item => item.label).join(','));
-            }
-        } catch (error) {
-            console.error('Error loading default values:', error);
-            message.error("Failed to load default discharge status");
-        }
-    };
-
     useEffect(() => {
-        loadDefaultValues();
-    }, [token]);
+        fetchData(true);
+    }, []); // Empty dependency array means this only runs on mount
 
-    useEffect(() => {
-        fetchData();
-    }, [department, group, from_date, to_date, typeString]);
+    // useEffect(() => {
+    //     if (typeString !== undefined) {
+    //         fetchData();
+    //     }
+    // }, [department, group, from_date, to_date, typeString]);
 
     const handleSetDefault = async () => {
         try {
             const defaultDischargeStatus = type.map(item => item.value);
-            await updateDefaultValues(token, { default_dischargestatus: defaultDischargeStatus });
+            await updateDefaultValues(token, { default_dischargeStatus: defaultDischargeStatus });
+            setSessionDischargeStatus(defaultDischargeStatus);
+            const newTypeString = defaultDischargeStatus.join(',');
+            setTypeString(newTypeString);
+            fetchData(); // Call fetchData directly here
             message.success("Default discharge status updated successfully");
         } catch (error) {
             console.error('Error setting default values:', error);
@@ -139,17 +172,17 @@ const Emergency = () => {
                         </div>
                     </div>
                     <div className={Styles.multi_select}>
-                        <Select
-                            onChange={(selectedOptions) => {
-                                setType(selectedOptions);
-                            }}
-                            className={Styles.multi_select_in}
-                            placeholder="Select discharge status..."
-                            styles={colourStyles}
-                            isMulti
-                            options={typeEmergency}
-                            value={type}
-                        />
+                    <Select
+    onChange={(selectedOptions) => {
+        setType(selectedOptions);
+    }}
+    className={Styles.multi_select_in}
+    placeholder="Select discharge status..."
+    styles={colourStyles}
+    isMulti
+    options={typeEmergency}
+    value={type}
+/>
                         <button onClick={handleType}>Reload</button>
                         <button onClick={handleSetDefault}>Set</button> 
                     </div>

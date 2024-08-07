@@ -115,29 +115,27 @@ const Dashboard = ({ Department_list }) => {
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Get default values
                 const defaultValues = await getDefaultValues(token);
                 
                 if (Department_list) {
-                    // Map Department_list to options format
                     const allDepartments = Department_list.map((item) => ({
                         label: item,
                         value: item
                     }));
                     setOp_dept(allDepartments);
-
-                    // Set default departments if available, otherwise use all departments
-                    if (defaultValues.default_departments && defaultValues.default_departments.length > 0) {
-                        console.log(defaultValues)
-                        const defaultDepts = defaultValues.default_departments.map(dept => ({
-                            label: dept,
-                            value: dept
-                        }));
-                        setDepartment_in(defaultDepts);
-
-                    } else {
-                        setDepartment_in(allDepartments);
-                    }
+    
+                    // Use default departments if available, otherwise use all departments
+                    const defaultDepts = defaultValues.default_departments && defaultValues.default_departments.length > 0
+                        ? defaultValues.default_departments.map(dept => ({ label: dept, value: dept }))
+                        : allDepartments;
+                    console.log(defaultDepts)
+                    setDepartment_in(defaultDepts);
+                    
+                    // Set other default values
+                    setGroup_in(defaultValues.default_group || option_groups[1]);
+                    setFrom_date_in(new Date(defaultValues.default_from_date || "2010-01-01"));
+                    setTo_date_in(new Date(defaultValues.default_to_date || "2019-12-31"));
+                    
                 }
             } catch (error) {
                 console.error('Error loading default values:', error);
@@ -152,7 +150,7 @@ const Dashboard = ({ Department_list }) => {
                 }
             }
         };
-
+    
         loadData();
     }, [Department_list, token]);
 
