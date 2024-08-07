@@ -135,7 +135,6 @@ const Dashboard = ({ Department_list }) => {
                     setGroup_in(defaultValues.default_group || option_groups[1]);
                     setFrom_date_in(new Date(defaultValues.default_from_date || "2010-01-01"));
                     setTo_date_in(new Date(defaultValues.default_to_date || "2019-12-31"));
-                    
                 }
             } catch (error) {
                 console.error('Error loading default values:', error);
