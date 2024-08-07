@@ -54,9 +54,48 @@ const Emergency = () => {
         const typeStr = type.map((item) => item.label).toString();
         setTypeString(typeStr);
         setSessionDischargeStatus(type.map(item => item.label));
-        fetchData(); // Call fetchData directly here
+    };
+    useEffect(() => {
+        fetchData(true);
+    }, []);
+
+    useEffect(() => {
+        if (typeString !== undefined) {
+            fetchData();
+        }
+    }, [department, group, from_date, to_date, typeString]);
+
+
+    const fetchData = async (initialLoad = false) => {
+        dispatch(setloading_text(true))
+        setloading(true)
+        try {
+            let currentTypeString = typeString;
+            if (initialLoad || !currentTypeString) {
+                currentTypeString = await loadDefaultValues();
+                setTypeString(currentTypeString);
+            }
+            const res = await getdata_emergency(from_date, to_date, department, group, token, currentTypeString);
+            const res_type = await getDischargeType(token);
+            changeTypeFormat(res_type.data);
+            setdata(res.data)
+            setloading(false)
+        } catch (error) {
+            console.error('Error in fetching data:', error);
+            setloading(false)
+        }
+        dispatch(setloading_text(false))
     };
 
+    useEffect(() => {
+        fetchData(true);
+    }, []);
+
+    useEffect(() => {
+        if (typeString !== undefined) {
+            fetchData();
+        }
+    }, [department, group, from_date, to_date, typeString]);
     const loadDefaultValues = async () => {
         try {
             // First, check session storage
@@ -88,45 +127,17 @@ const Emergency = () => {
         }
     };
 
-    const fetchData = async (initialLoad = false) => {
-        dispatch(setloading_text(true))
-        setloading(true)
-        try {
-            let currentTypeString = typeString;
-            if (initialLoad || !currentTypeString) {
-                currentTypeString = await loadDefaultValues();
-                setTypeString(currentTypeString);
-            }
-            const res = await getdata_emergency(from_date, to_date, department, group, token, currentTypeString);
-            const res_type = await getDischargeType(token);
-            changeTypeFormat(res_type.data);
-            setdata(res.data)
-            setloading(false)
-        } catch (error) {
-            console.error('Error in fetching data:', error);
-            setloading(false)
-        }
-        dispatch(setloading_text(false))
-    };
 
-    useEffect(() => {
-        fetchData(true);
-    }, []); // Empty dependency array means this only runs on mount
-
-    // useEffect(() => {
-    //     if (typeString !== undefined) {
-    //         fetchData();
-    //     }
-    // }, [department, group, from_date, to_date, typeString]);
 
     const handleSetDefault = async () => {
         try {
             const defaultDischargeStatus = type.map(item => item.value);
-            await updateDefaultValues(token, { default_dischargeStatus: defaultDischargeStatus });
-            setSessionDischargeStatus(defaultDischargeStatus);
+            await updateDefaultValues(token, { default_dischargestatus: defaultDischargeStatus });
+            
             const newTypeString = defaultDischargeStatus.join(',');
             setTypeString(newTypeString);
-            fetchData(); // Call fetchData directly here
+            setSessionDischargeStatus(defaultDischargeStatus);
+            fetchData();
             message.success("Default discharge status updated successfully");
         } catch (error) {
             console.error('Error setting default values:', error);
@@ -136,90 +147,85 @@ const Emergency = () => {
 
     const admissioncount = data?.label.admissions || 0;
 
-    return (<>
-        {loading ?
-            <div className={Styles.cont_preloader}>
-                < ClipLoader className={`${theme === 'dark' && Styles.cont_preloader_load}`} />
-            </div>
-            :
-            <div className={Styles.cont}>
-                <div className={Styles.up}>
-                    <p className={Styles.up_count}>Admissions: {admissioncount}</p>
+    return (
+        <>
+            {loading ? (
+                <div className={Styles.cont_preloader}>
+                    <ClipLoader className={`${theme === 'dark' && Styles.cont_preloader_load}`} />
                 </div>
-                <div className={Styles.down}>
-                    <div className={Styles.down_up}>
-                        <div className={Styles.down_upchild}>
-                            <FlexiblePlotlyChart data={data?.uniquePatientCounts}
-                                key={`chart-${themeKey}`}
-                                chartTitle={"Department wise Admissions count"}
-                                xAxisTitle={"Date"}
-                                yAxisTitle={"Admissions counts"}
-                                chartType={Userselection?.bio?.emergency?.uniquePatientCounts?.SelectedType}
-                            // chartType={"groupedBar"}
-                            />
-                        </div>
-                        <div className={Styles.down_upchild}>
-                            {/* this graph will turn to pie chart when single */}
-                            <FlexiblePlotlyChart
-                                key={`chart-${themeKey}`}
-                                data={data?.durationOfStay}
-                                chartTitle="Department wise average duration of stay"
-                                xAxisTitle="Time"
-                                yAxisTitle="Duration (Days)"
-                                chartType={Userselection?.bio?.emergency?.durationOfStay?.SelectedType}
-                            // chartType={"groupedBar"}
-                            />
-                        </div>
+            ) : (
+                <div className={Styles.cont}>
+                    <div className={Styles.up}>
+                        <p className={Styles.up_count}>Admissions: {admissioncount}</p>
                     </div>
-                    <div className={Styles.multi_select}>
-                    <Select
-    onChange={(selectedOptions) => {
-        setType(selectedOptions);
-    }}
-    className={Styles.multi_select_in}
-    placeholder="Select discharge status..."
-    styles={colourStyles}
-    isMulti
-    options={typeEmergency}
-    value={type}
-/>
-                        <button onClick={handleType}>Reload</button>
-                        <button onClick={handleSetDefault}>Set</button> 
-                    </div>
-                    <div className={Styles.down_down}>
-                        <div className={Styles.down_downchild1}>
-                            {/* // this raph will turn to heatmap when single */}
-                          
-                             <FlexiblePlotlyChart
-                                key={`chart-${themeKey}`}
-                                data={data?.survivalDeathCounts}
-                                chartTitle="Discharge Status"
-                                xAxisTitle="Time"
-                                yAxisTitle="Patient count"
-                                chartType={Userselection?.bio?.emergency?.survivalDeathCounts?.SelectedType}
-                            // chartType={"groupedBar"}
-                            />
+                    <div className={Styles.down}>
+                        <div className={Styles.down_up}>
+                            <div className={Styles.down_upchild}>
+                                <FlexiblePlotlyChart data={data?.uniquePatientCounts}
+                                    key={`chart-${themeKey}`}
+                                    chartTitle={"Department wise Admissions count"}
+                                    xAxisTitle={"Date"}
+                                    yAxisTitle={"Admissions counts"}
+                                    chartType={Userselection?.bio?.emergency?.uniquePatientCounts?.SelectedType}
+                                />
+                            </div>
+                            <div className={Styles.down_upchild}>
+                                <FlexiblePlotlyChart
+                                    key={`chart-${themeKey}`}
+                                    data={data?.durationOfStay}
+                                    chartTitle="Department wise average duration of stay"
+                                    xAxisTitle="Time"
+                                    yAxisTitle="Duration (Days)"
+                                    chartType={Userselection?.bio?.emergency?.durationOfStay?.SelectedType}
+                                />
+                            </div>
                         </div>
-                        <div className={Styles.down_downchild2}>
-                            <FlexiblePlotlyChart
-                                key={`chart-${themeKey}`}
-                                data={formatDataForPieChart(data?.genderDistribution)}
-                                chartTitle="Discharge Status"
-                                chartType={Userselection?.bio?.emergency?.genderDistribution?.SelectedType}
-                            // chartType={"pie"}
+                        <div className={Styles.multi_select}>
+                            <Select
+                                onChange={(selectedOptions) => {
+                                    setType(selectedOptions);
+                                }}
+                                className={Styles.multi_select_in}
+                                placeholder="Select discharge status..."
+                                styles={colourStyles}
+                                isMulti
+                                options={typeEmergency}
+                                value={type}
                             />
-                            <FlexiblePlotlyChart
-                                key={`chart-${themeKey}`}
-                                data={formatDataForPieChart(data?.totalPatientCount)}
-                                chartTitle="Department wise admissions"
-                                chartType={Userselection?.bio?.emergency?.totalPatientCount?.SelectedType}
-                            // chartType={"pie"}
-                            />
+                            <button onClick={handleType}>Reload</button>
+                            <button onClick={handleSetDefault}>Set</button> 
+                        </div>
+                        <div className={Styles.down_down}>
+                            <div className={Styles.down_downchild1}>
+                                <FlexiblePlotlyChart
+                                    key={`chart-${themeKey}`}
+                                    data={data?.survivalDeathCounts}
+                                    chartTitle="Discharge Status"
+                                    xAxisTitle="Time"
+                                    yAxisTitle="Patient count"
+                                    chartType={Userselection?.bio?.emergency?.survivalDeathCounts?.SelectedType}
+                                />
+                            </div>
+                            <div className={Styles.down_downchild2}>
+                                <FlexiblePlotlyChart
+                                    key={`chart-${themeKey}`}
+                                    data={formatDataForPieChart(data?.genderDistribution)}
+                                    chartTitle="Discharge Status"
+                                    chartType={Userselection?.bio?.emergency?.genderDistribution?.SelectedType}
+                                />
+                                <FlexiblePlotlyChart
+                                    key={`chart-${themeKey}`}
+                                    data={formatDataForPieChart(data?.totalPatientCount)}
+                                    chartTitle="Department wise admissions"
+                                    chartType={Userselection?.bio?.emergency?.totalPatientCount?.SelectedType}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
-    </>);
+            )}
+        </>
+    );
 }
+
 export default Emergency;
