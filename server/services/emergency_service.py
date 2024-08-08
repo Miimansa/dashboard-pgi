@@ -3,6 +3,7 @@ import json
 from datetime import datetime, timedelta
 from config import Config
 import numpy as np
+from collections import defaultdict
 
 class EmergencyServices:
     def __init__ (self,emergency_data1,emergency_data2,emergency_data3,emergency_data4):
@@ -67,6 +68,7 @@ class EmergencyServices:
 
         return result
 
+
     def get_survivalDeath_Counts(self, grouping_type):
         if self.data_2.empty:
             return json.dumps({"message": "No data available"}, indent=2)
@@ -84,18 +86,33 @@ class EmergencyServices:
         # Sort the grouped dataframe by the original Date
         grouped = grouped.sort_values('Date')
         
+        # Create a complete date range
+        start_date = dataframe['Date'].min()
+        end_date = dataframe['Date'].max()
+        if grouping_type == 'monthly':
+            date_range = pd.date_range(start=start_date, end=end_date, freq='MS')
+        elif grouping_type == 'yearly':
+            date_range = pd.date_range(start=start_date, end=end_date, freq='YS')
+        else:  # weekly
+            date_range = pd.date_range(start=start_date, end=end_date, freq='W-MON')
+        
+        complete_dates = [self.format_date(date, grouping_type) for date in date_range]
+        
         result = []
         for status in grouped['Discharge_Status'].unique():
-
             status_data = grouped[grouped['Discharge_Status'] == status]
+            status_dict = defaultdict(int, zip(status_data['FormattedDate'], status_data['Count']))
+            
+            x_values = complete_dates
+            y_values = [status_dict[date] for date in x_values]
+            
             result.append({
                 "name": status,
-                "x": status_data['FormattedDate'].tolist(),
-                "y": status_data['Count'].tolist()
+                "x": x_values,
+                "y": y_values
             })
         
         return result
-
 
     def get_durationOfStay(self, grouping_type):
         if self.data_3.empty:
