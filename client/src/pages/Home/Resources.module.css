@@ -7,6 +7,12 @@
     height: 100%;
     font-family: 'ubuntu';
 }
+.dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Space between the Select and Button */
+}
 
 .up {
     display: flex;

@@ -55,7 +55,6 @@ const Home = () => {
     const department = useSelector((state) => state.filter.department) || '';
     const [selectedBar, setSelectedBar] = useState(null);
     const [pieChartData, setPieChartData] = useState();
-    const [setValue, setSelected] = useState(null);
     const [renderCount, setRenderCount] = useState(0);
     const [small, setsmall] = useState(false);
     const [loading, setloading] = useState(false);
@@ -119,12 +118,14 @@ const Home = () => {
     const theme = useSelector((state => state.user.user.theme));
 
     const handleChartChange = value => {
-        setSelected(value);
+        setSelectedChart(value);
+        if(value=='None')
+            setShowFullScreenChart(false);
     };
 
     const handleViewChart = () => {
         setShowFullScreenChart(true);
-        setSelectedChart(setValue);
+
     };
 
     return (
@@ -142,12 +143,10 @@ const Home = () => {
                             <p className={Styles.up_count}>Patients: <strong>{patientcount}</strong></p>
                         </div>
                         <div className={Styles.dropdown}>
-                            <p>View Full Screen Chart</p>
                             <Select
                                 style={{ width: 200 }}
-                                placeholder="Select a chart"
+                                placeholder="Full Screen Chart"
                                 onChange={handleChartChange}
-                                 defaultValue="None"
                             >
                                 <Option value="chart1">Chart 1</Option>
                                 <Option value="chart2">Chart 2</Option>
@@ -158,7 +157,7 @@ const Home = () => {
                         </div>
                     </div>
                     <div className={Styles.down}>
-                        {showFullScreenChart && selectedChart && selectedChart!='None' ? (
+                        {showFullScreenChart && selectedChart!='None' && selectedChart!='None' ? (
                             selectedChart === "chart1" ? (
                                 <FlexiblePlotlyChart
                                     key={`chart-${themeKey}`}

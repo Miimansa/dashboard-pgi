@@ -7,9 +7,11 @@ import { getdata_emergency, getDischargeType, updateDefaultValues, getDefaultVal
 import { formatDataForPieChart } from "../Functions_Files/file_functions";
 import Select from 'react-select';
 import { colourStyles } from "../Functions_Files/filters_data";
-import { message } from "antd";
+import { message,Select as AntSelect,Button } from "antd";
 import FlexiblePlotlyChart from "../Graphs/FlexibleChart";
 
+
+const Option = {AntSelect};
 // Utility functions for session storage
 const setSessionDischargeStatus = (types) => {
     localStorage.setItem('dischargeStatus', JSON.stringify(types));
@@ -26,7 +28,8 @@ const Emergency = () => {
     const [typeString, setTypeString] = useState('');
     const [loading, setloading] = useState(true);
     const [data, setdata] = useState(null);
-
+    const [selectedChart, setSelectedChart] = useState(null);
+    const [showFullScreenChart, setShowFullScreenChart] = useState(false);
     const currentTheme = useSelector((state) => state.graph.currentTheme);
     const [themeKey, setThemeKey] = useState(0);
     const Userselection = useSelector((state) => state.user.user);
@@ -146,7 +149,14 @@ const Emergency = () => {
     };
 
     const admissioncount = data?.label.admissions || 0;
-
+    const handleChartChange = value => {
+        setSelectedChart(value);
+        if(value=='None')
+            setShowFullScreenChart(false);
+    };
+    const handleViewChart = () => {
+        setShowFullScreenChart(true);
+    };
     return (
         <>
             {loading ? (
@@ -157,19 +167,33 @@ const Emergency = () => {
                 <div className={Styles.cont}>
                     <div className={Styles.up}>
                         <p className={Styles.up_count}>Admissions: {admissioncount}</p>
+                        <div className={Styles.dropdown}>
+                            <AntSelect
+                                style={{ width: 200 }}
+                                placeholder="Full Screen Chart"
+                                onChange={handleChartChange}
+                            >
+                                <Option value="chart1">chart1</Option>
+                                <Option value="chart2">chart2</Option>
+                                <Option value="chart3">chart3</Option>
+                                <Option value="chart4">chart4</Option>
+                                <Option value="None">None</Option>
+                            </AntSelect>
+                            <Button onClick={handleViewChart}>View</Button>
+                        </div>
                     </div>
                     <div className={Styles.down}>
-                        <div className={Styles.down_up}>
-                            <div className={Styles.down_upchild}>
-                                <FlexiblePlotlyChart data={data?.uniquePatientCounts}
+                        {showFullScreenChart && selectedChart !== 'None' ? (
+                            selectedChart === "chart1" ? (
+                                <FlexiblePlotlyChart
+                                    data={data?.uniquePatientCounts}
                                     key={`chart-${themeKey}`}
                                     chartTitle={"Department wise Admissions count"}
                                     xAxisTitle={"Date"}
                                     yAxisTitle={"Admissions counts"}
                                     chartType={Userselection?.bio?.emergency?.uniquePatientCounts?.SelectedType}
                                 />
-                            </div>
-                            <div className={Styles.down_upchild}>
+                            ) : selectedChart === "chart2" ? (
                                 <FlexiblePlotlyChart
                                     key={`chart-${themeKey}`}
                                     data={data?.durationOfStay}
@@ -178,25 +202,7 @@ const Emergency = () => {
                                     yAxisTitle="Duration (Days)"
                                     chartType={Userselection?.bio?.emergency?.durationOfStay?.SelectedType}
                                 />
-                            </div>
-                        </div>
-                        <div className={Styles.multi_select}>
-                            <Select
-                                onChange={(selectedOptions) => {
-                                    setType(selectedOptions);
-                                }}
-                                className={Styles.multi_select_in}
-                                placeholder="Select discharge status..."
-                                styles={colourStyles}
-                                isMulti
-                                options={typeEmergency}
-                                value={type}
-                            />
-                            <button onClick={handleType}>Reload</button>
-                            <button onClick={handleSetDefault}>Set</button> 
-                        </div>
-                        <div className={Styles.down_down}>
-                            <div className={Styles.down_downchild1}>
+                            ) : selectedChart === "chart3" ? (
                                 <FlexiblePlotlyChart
                                     key={`chart-${themeKey}`}
                                     data={data?.survivalDeathCounts}
@@ -205,27 +211,85 @@ const Emergency = () => {
                                     yAxisTitle="Patient count"
                                     chartType={Userselection?.bio?.emergency?.survivalDeathCounts?.SelectedType}
                                 />
-                            </div>
-                            <div className={Styles.down_downchild2}>
+                            ) : selectedChart === "chart4" ? (
                                 <FlexiblePlotlyChart
                                     key={`chart-${themeKey}`}
                                     data={formatDataForPieChart(data?.genderDistribution)}
                                     chartTitle="Discharge Status"
                                     chartType={Userselection?.bio?.emergency?.genderDistribution?.SelectedType}
                                 />
-                                <FlexiblePlotlyChart
-                                    key={`chart-${themeKey}`}
-                                    data={formatDataForPieChart(data?.totalPatientCount)}
-                                    chartTitle="Department wise admissions"
-                                    chartType={Userselection?.bio?.emergency?.totalPatientCount?.SelectedType}
-                                />
-                            </div>
-                        </div>
+                            ) : null
+                        ) : (
+                            <>
+                                <div className={Styles.down_up}>
+                                    <div className={Styles.down_upchild}>
+                                        <FlexiblePlotlyChart
+                                            data={data?.uniquePatientCounts}
+                                            key={`chart-${themeKey}`}
+                                            chartTitle={"Department wise Admissions count"}
+                                            xAxisTitle={"Date"}
+                                            yAxisTitle={"Admissions counts"}
+                                            chartType={Userselection?.bio?.emergency?.uniquePatientCounts?.SelectedType}
+                                        />
+                                    </div>
+                                    <div className={Styles.down_upchild}>
+                                        <FlexiblePlotlyChart
+                                            key={`chart-${themeKey}`}
+                                            data={data?.durationOfStay}
+                                            chartTitle="Department wise average duration of stay"
+                                            xAxisTitle="Time"
+                                            yAxisTitle="Duration (Days)"
+                                            chartType={Userselection?.bio?.emergency?.durationOfStay?.SelectedType}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={Styles.multi_select}>
+                                    <Select
+                                        onChange={(selectedOptions) => {
+                                            setType(selectedOptions);
+                                        }}
+                                        className={Styles.multi_select_in}
+                                        placeholder="Select discharge status..."
+                                        styles={colourStyles}
+                                        isMulti
+                                        options={typeEmergency}
+                                        value={type}
+                                    />
+                                    <button onClick={handleType}>Reload</button>
+                                    <button onClick={handleSetDefault}>Set</button>
+                                </div>
+                                <div className={Styles.down_down}>
+                                    <div className={Styles.down_downchild1}>
+                                        <FlexiblePlotlyChart
+                                            key={`chart-${themeKey}`}
+                                            data={data?.survivalDeathCounts}
+                                            chartTitle="Discharge Status"
+                                            xAxisTitle="Time"
+                                            yAxisTitle="Patient count"
+                                            chartType={Userselection?.bio?.emergency?.survivalDeathCounts?.SelectedType}
+                                        />
+                                    </div>
+                                    <div className={Styles.down_downchild2}>
+                                        <FlexiblePlotlyChart
+                                            key={`chart-${themeKey}`}
+                                            data={formatDataForPieChart(data?.genderDistribution)}
+                                            chartTitle="Discharge Status"
+                                            chartType={Userselection?.bio?.emergency?.genderDistribution?.SelectedType}
+                                        />
+                                        <FlexiblePlotlyChart
+                                            key={`chart-${themeKey}`}
+                                            data={formatDataForPieChart(data?.totalPatientCount)}
+                                            chartTitle="Department wise admissions"
+                                            chartType={Userselection?.bio?.emergency?.totalPatientCount?.SelectedType}
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}
         </>
     );
 }
-
-export default Emergency;
+export default Emergency

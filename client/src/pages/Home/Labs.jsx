@@ -10,7 +10,17 @@ import { formatDataForPieChart } from "../Functions_Files/file_functions";
 import { colourStyles } from "../Functions_Files/filters_data";
 import Select from 'react-select'
 import Switch from '@mui/material/Switch';
-import { message } from "antd";
+import { message, Button,Select as AntSelect } from "antd";
+
+const { Option } = AntSelect;
+const options = [
+    { value: 'chart1', label: 'chart1' },
+    { value: 'chart2', label: 'chart2' },
+    { value: 'chart3', label: 'chart3'  },
+    { value: 'chart4', label: 'chart4'  },
+    { value: 'None', label: 'None' }
+];
+
 
 const Labs = () => {
     const [typetest, settypetest] = useState([]);
@@ -19,6 +29,8 @@ const Labs = () => {
     const [checked, setChecked] = React.useState(true);
     const [loading, setloading] = useState(true);
     const [data, setdata] = useState(null);
+    const [selectedChart, setSelectedChart] = useState(null);
+    const [showFullScreenChart, setShowFullScreenChart] = useState(false);
 
     const currentTheme = useSelector((state) => state.graph.currentTheme);
     const [themeKey, setThemeKey] = useState(0);
@@ -30,7 +42,8 @@ const Labs = () => {
     const token = useSelector((state) => state.user.token);
     const theme = useSelector((state => state.user.user.theme));
     const dispatch = useDispatch();
-
+    console.log(selectedChart)
+    console.log(showFullScreenChart)
     useEffect(() => {
         setThemeKey(prevKey => prevKey + 1);
     }, [currentTheme]);
@@ -40,18 +53,20 @@ const Labs = () => {
         if (e.target.checked) message.info("Pie chart showing data for Gender Count")
         else message.info("Pie chart showing data for Visits vs admissions count")
     };
+
     const setSessionLabTypes = (types) => {
         localStorage.setItem('labTypes', JSON.stringify(types));
     };
-    
+
     const getSessionLabTypes = () => {
         const types = localStorage.getItem('labTypes');
         return types ? JSON.parse(types) : null;
     };
+
     const changetypeformat = (data) => {
         const formattedType = data.map(item => ({
-          label: item,
-          value: item
+            label: item,
+            value: item
         }));
         settypetest(formattedType);
     };
@@ -60,13 +75,12 @@ const Labs = () => {
         const typeString = type.map((item) => item.label).toString();
         settype_string(typeString);
         setSessionLabTypes(type.map(item => item.label));
-
     };
-    
+
     useEffect(() => {
         fetchData(true);
     }, []);
-    
+
     useEffect(() => {
         if (type_string !== undefined) {
             fetchData();
@@ -93,15 +107,15 @@ const Labs = () => {
         }
         dispatch(setloading_text(false))
     };
-    
+
     useEffect(() => {
         if (type_string !== undefined) {
             fetchData();
         }
     }, [department, group, from_date, to_date, type_string]);
+
     const loadDefaultValues = async () => {
         try {
-            // First, check session storage
             const sessionTypes = getSessionLabTypes();
             if (sessionTypes) {
                 const sessionLabTypes = sessionTypes.map(item => ({
@@ -111,8 +125,7 @@ const Labs = () => {
                 setType(sessionLabTypes);
                 return sessionTypes.join(',');
             }
-    
-            // If no session state, load default values
+
             const defaultValues = await getDefaultValues(token);
             if (defaultValues.default_labtypes) {
                 const defaultLabTypes = defaultValues.default_labtypes.map(item => ({
@@ -129,9 +142,6 @@ const Labs = () => {
             return '';
         }
     };
-    // useEffect(() => {
-    //     loadDefaultValues();
-    // }, [token]);
 
     const handleSetDefault = async () => {
         try {
@@ -146,6 +156,16 @@ const Labs = () => {
             message.error("Failed to update default lab types");
         }
     };
+
+    const handleChartChange = value => {
+        setSelectedChart(value);
+        if(value=='None')
+            setShowFullScreenChart(false);
+    };
+    const handleViewChart = () => {
+        setShowFullScreenChart(true);
+    };
+
     return (<>
         {loading ?
             <div className={Styles.cont_preloader}>
@@ -153,9 +173,25 @@ const Labs = () => {
             </div>
             :
             <div className={Styles.cont}>
+                <div className={Styles.up}>
+                    <div className={Styles.dropdown}>
+                            <AntSelect
+                                style={{ width: 200 }}
+                                placeholder="Full Screen Chart"
+                                onChange={handleChartChange}
+                            >
+                                <Option value="chart1">Chart 1</Option>
+                                <Option value="chart2">Chart 2</Option>
+                                <Option value="chart3">Chart 3</Option>
+                                <Option value="None">None</Option>
+                            </AntSelect>
+                            <Button onClick={handleViewChart}>View</Button>
+                        </div>
+                </div>
                 <div className={Styles.down}>
-                    <div className={Styles.down_up}>
-                        <div className={Styles.down_upchild}>
+                    
+                    {showFullScreenChart && selectedChart !== 'None' ? (
+                        selectedChart === "chart1" ? (
                             <FlexiblePlotlyChart
                                 key={`chart-${themeKey}`}
                                 data={data?.lab_order_count}
@@ -163,11 +199,8 @@ const Labs = () => {
                                 xAxisTitle="Time"
                                 yAxisTitle="Count"
                                 chartType={Userselection?.bio?.labs?.LabOrderCount?.SelectedType}
-                            // chartType={"line"}
-
                             />
-                        </div>
-                        <div className={Styles.down_upchild}>
+                        ) : selectedChart === "chart2" ? (
                             <FlexiblePlotlyChart
                                 key={`chart-${themeKey}`}
                                 data={data?.lab_orders_by_department}
@@ -175,66 +208,119 @@ const Labs = () => {
                                 xAxisTitle="Time"
                                 yAxisTitle="Count"
                                 chartType={Userselection?.bio?.labs?.labOrdersByDepartment?.SelectedType}
-                            // chartType={"line"}
                             />
-                        </div>
+                        ) : selectedChart === "chart3" ? (
+                            <>
+                            <div className={Styles.multi_select}>
+                        <Select
+                            onChange={(selectedOptions) => {
+                                setType(selectedOptions);
+                            }}
+                            className={Styles.multi_select_in}
+                            placeholder="Select disease type..."
+                            styles={colourStyles}
+                            isMulti
+                            options={typetest}
+                            value={type}
+                        />
+                        <button onClick={handleType}>Reload</button>
+                        <button onClick={handleSetDefault}>Set</button>
                     </div>
-                    <div className={Styles.multi_select}>
-                    <Select
-                        onChange={(selectedOptions) => {
-                            setType(selectedOptions);
-                        }}
-                        className={Styles.multi_select_in}
-                        placeholder="Select disease type..."
-                        styles={colourStyles}
-                        isMulti
-                        options={typetest}
-                        value={type}
-                    />
-                    <button onClick={handleType}>Reload</button>
-                    <button onClick={handleSetDefault}>Save</button>
-                </div>
-                        
-                    <div className={Styles.down_down}>
-                        <div className={Styles.down_downchild1}>
-                            <FlexiblePlotlyChart data={data?.monthly_lab_test_counts}
+                            <FlexiblePlotlyChart
+                                data={data?.monthly_lab_test_counts}
                                 key={`chart-${themeKey}`}
                                 chartTitle="Lab Test types count"
                                 xAxisTitle="Time"
                                 yAxisTitle="Count"
-                                // chartType={"line"}
                                 chartType={Userselection?.bio?.labs?.monthlyLabTestCounts?.SelectedType}
                             />
-                        </div>
-                        <div className={Styles.down_downchild2}>
-                        <Switch
-                                    checked={checked}
-                                    onChange={handleChange}
-                                    inputProps={{ 'aria-label': 'controlled' }}
-                                />
-                                 <>
-                                    {checked ?
-                                         <FlexiblePlotlyChart
-                                         data={formatDataForPieChart(data?.patient_count_by_department)}
-                                         chartTitle={"Lab Test wise lab orders"}
-                                         chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
-                                         // chartType={"pie"}
-                                         key={`chart-${themeKey}`}
-                                     />
-                                        :
-                                        <FlexiblePlotlyChart
-                                        data={formatDataForPieChart(data?.patient_count_by_total_department)}
-                                        chartTitle={"Department wise lab orders"}
-                                        chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
-                                        // chartType={"pie"}
+                            </>
+                        ) : selectedChart === "chart4" ? (
+                            <FlexiblePlotlyChart
+                                data={formatDataForPieChart(checked ? data?.patient_count_by_department : data?.patient_count_by_total_department)}
+                                chartTitle={checked ? "Lab Test wise lab orders" : "Department wise lab orders"}
+                                chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
+                                key={`chart-${themeKey}`}
+                            />
+                        ) : null
+                    ) : (
+                        <>
+                            <div className={Styles.down_up}>
+                                <div className={Styles.down_upchild}>
+                                    <FlexiblePlotlyChart
                                         key={`chart-${themeKey}`}
+                                        data={data?.lab_order_count}
+                                        chartTitle="Lab order count"
+                                        xAxisTitle="Time"
+                                        yAxisTitle="Count"
+                                        chartType={Userselection?.bio?.labs?.LabOrderCount?.SelectedType}
                                     />
-                                    }
-                                </>
-                           
-
-                        </div>
+                                </div>
+                                <div className={Styles.down_upchild}>
+                                    <FlexiblePlotlyChart
+                                        key={`chart-${themeKey}`}
+                                        data={data?.lab_orders_by_department}
+                                        chartTitle="Department wise lab orders count"
+                                        xAxisTitle="Time"
+                                        yAxisTitle="Count"
+                                        chartType={Userselection?.bio?.labs?.labOrdersByDepartment?.SelectedType}
+                                    />
+                                </div>
+                            </div>
+                            <div className={Styles.multi_select}>
+                        <Select
+                            onChange={(selectedOptions) => {
+                                setType(selectedOptions);
+                            }}
+                            className={Styles.multi_select_in}
+                            placeholder="Select disease type..."
+                            styles={colourStyles}
+                            isMulti
+                            options={typetest}
+                            value={type}
+                        />
+                        <button onClick={handleType}>Reload</button>
+                        <button onClick={handleSetDefault}>Set</button>
                     </div>
+                            <div className={Styles.down_down}>
+                            
+                                <div className={Styles.down_downchild1}>
+                                    <FlexiblePlotlyChart
+                                        data={data?.monthly_lab_test_counts}
+                                        key={`chart-${themeKey}`}
+                                        chartTitle="Lab Test types count"
+                                        xAxisTitle="Time"
+                                        yAxisTitle="Count"
+                                        chartType={Userselection?.bio?.labs?.monthlyLabTestCounts?.SelectedType}
+                                    />
+                                </div>
+                                <div className={Styles.down_downchild2}>
+                                    <Switch
+                                        checked={checked}
+                                        onChange={handleChange}
+                                        inputProps={{ 'aria-label': 'controlled' }}
+                                    />
+                                    <>
+                                        {checked ?
+                                            <FlexiblePlotlyChart
+                                                data={formatDataForPieChart(data?.patient_count_by_department)}
+                                                chartTitle={"Lab Test wise lab orders"}
+                                                chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
+                                                key={`chart-${themeKey}`}
+                                            />
+                                            :
+                                            <FlexiblePlotlyChart
+                                                data={formatDataForPieChart(data?.patient_count_by_total_department)}
+                                                chartTitle={"Department wise lab orders"}
+                                                chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
+                                                key={`chart-${themeKey}`}
+                                            />
+                                        }
+                                    </>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         }
