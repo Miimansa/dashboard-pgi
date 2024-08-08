@@ -147,6 +147,7 @@ const Home = () => {
                                 style={{ width: 200 }}
                                 placeholder="Select a chart"
                                 onChange={handleChartChange}
+                                 defaultValue="None"
                             >
                                 <Option value="chart1">Chart 1</Option>
                                 <Option value="chart2">Chart 2</Option>
