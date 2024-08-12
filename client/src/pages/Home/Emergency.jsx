@@ -9,7 +9,7 @@ import Select from 'react-select';
 import { colourStyles } from "../Functions_Files/filters_data";
 import { message,Select as AntSelect,Button } from "antd";
 import FlexiblePlotlyChart from "../Graphs/FlexibleChart";
-
+import DischargeStatusSelector from "../Graphs/DischargeGroupSelector";
 
 const Option = {AntSelect};
 // Utility functions for session storage
@@ -270,18 +270,7 @@ const Emergency = () => {
                                         />
                                     </div>
                                     <div className={Styles.down_downchild2}>
-                                        <FlexiblePlotlyChart
-                                            key={`chart-${themeKey}`}
-                                            data={formatDataForPieChart(data?.genderDistribution)}
-                                            chartTitle="Discharge Status"
-                                            chartType={Userselection?.bio?.emergency?.genderDistribution?.SelectedType}
-                                        />
-                                        <FlexiblePlotlyChart
-                                            key={`chart-${themeKey}`}
-                                            data={formatDataForPieChart(data?.totalPatientCount)}
-                                            chartTitle="Department wise admissions"
-                                            chartType={Userselection?.bio?.emergency?.totalPatientCount?.SelectedType}
-                                        />
+                                        <DischargeStatusSelector dischargeTypes={typeEmergency.map(item => item.label)} />
                                     </div>
                                 </div>
                             </>

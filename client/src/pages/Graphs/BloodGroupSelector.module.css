@@ -1,0 +1,106 @@
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .leftPanel {
+    width: 50%;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  
+  .rightPanel {
+    width: 50%;
+    height: 100%;
+  }
+  
+  .selectWrapper {
+    margin-bottom: 20px;
+  }
+  
+  .labelWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  
+  .styledSelect {
+    width: 100%;
+  }
+  
+  .styledSelect :global(.ant-select-selector) {
+    max-height: 32px;
+    overflow: hidden;
+  }
+  
+  .styledSelect :global(.ant-select-selection-overflow) {
+    max-height: 32px;
+    overflow: hidden;
+  }
+  .outerContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .titleContainer {
+    margin-top: 0px;
+    text-align: center;
+  }
+  
+  .titleContainer h4 {
+  
+    margin-bottom: 0;
+  }
+  
+  .titleContainer h5 {
+    margin-top: 0px !important;
+    font-weight: normal;
+  }
+  
+  .container {
+    display: flex;
+    width: 100%;
+  }
+  
+  /* ... (other existing styles) */
+  .styledSelect :global(.ant-select-selection-item) {
+    display: inline-block;
+    max-width: calc(100% - 20px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .buttonGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+  }
+  
+  .iconButton {
+    background-color: var(--primary-color-background);
+    color: var(--secondary-color-text);
+    flex: 1;
+    margin: 0 4px;
+  }
+  .searchButton {
+    margin-top: 20px;
+  }
+  
+  .rightPanel > div {
+    width: 100%;
+    height: 100%;
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+  
+    .leftPanel,
+    .rightPanel {
+      width: 100%;
+    }
+  }

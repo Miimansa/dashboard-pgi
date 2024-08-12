@@ -1,5 +1,5 @@
 import axios from "axios";
-import { update_default_values,get_default_values,get_visit_url,get_discharge_type_url,homedata_url, get_dept_url, signup_url, opt_url, login_url, resend_opt_url, update_user_url, update_usertheme_url, validuser_url, labdata_url, resources_url, emergency_url, disease_url, get_test_type_url, request_pass_url, verify_request_url, changepass_url,newPassword_url } from "./API";
+import { get_lab_agg_url,get_emergency_agg_url,get_resources_agg_url,update_default_values,get_default_values,get_visit_url,get_discharge_type_url,homedata_url, get_dept_url, signup_url, opt_url, login_url, resend_opt_url, update_user_url, update_usertheme_url, validuser_url, labdata_url, resources_url, emergency_url, disease_url, get_test_type_url, request_pass_url, verify_request_url, changepass_url,newPassword_url } from "./API";
 
 // Function to get home data through axios
 const getdata_home = async (date_from, date_to, department_names, grouping_type, token) => {
@@ -30,6 +30,50 @@ const getMultiData = async (date_from, date_to, departments, genders,visitTypes,
         return response;
     } catch (error) {
         console.error('Error in fetching data:', error);
+    }
+};
+const getLabData = async (date_from, date_to, departments, testTypes, factor, groupingType, token) => {
+    const url = `${get_lab_agg_url}/?date_from=${date_from}&date_to=${date_to}&department_names=${departments}&type=${testTypes}&factor=${factor === 'department' ? 'DepartmentName' : 'Lab Record Name'}&grouping_type=${groupingType}`;
+
+    try {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+        const response = await axios.get(url, { headers });
+        return response;
+    } catch (error) {
+        console.error('Error in fetching lab data:', error);
+    }
+};
+const getDischargeData = async (date_from, date_to, departments, dischargeTypes, factor, groupingType, token) => {
+    const url = `${get_emergency_agg_url}/?date_from=${date_from}&date_to=${date_to}&department_names=${departments}&discharge_types=${dischargeTypes}&factor=${factor === 'department' ? 'DepartmentName' : 'dischargestatus'}&grouping_type=${groupingType}`;
+
+    try {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+        const response = await axios.get(url, { headers });
+        return response;
+    } catch (error) {
+        console.error('Error in fetching discharge data:', error);
+    }
+};
+
+const getBloodGroupData = async (date_from, date_to, departments, bloodGroups, factor, grouping_type, token) => {
+    const url = `${get_resources_agg_url}/?date_from=${date_from}&date_to=${date_to}&department_names=${departments.join(',')}&factor=${factor === 'DepartmentName' ? 'DepartmentName' : 'Blood Group'}&grouping_type=${grouping_type}&blood-groups=${bloodGroups.join(',')}`;
+
+    try {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+        const response = await axios.get(url, { headers });
+        return response;
+    } catch (error) {
+        console.error('Error in fetching blood group data:', error);
+        throw error; // Re-throw the error so it can be handled by the calling function
     }
 };
 // Function to get all department names
@@ -320,4 +364,4 @@ const changeNewPassword = async (email, oldPassword, newPassword) => {
         throw error;
     }
 };
-export { updateDefaultValues,getDefaultValues,getMultiData,getDischargeType,changePassword, requestVerify, requestResetPassword, gettypes_test, getdata_disease, getdata_emergency, getdata_resources, getdata_home, getDeptList, registerUser, verifyotp, resendOtp, loginUser, updateUser, updateUserTheme, validUser, getdata_lab,changeNewPassword }
+export { getDischargeData,getLabData,getBloodGroupData,updateDefaultValues,getDefaultValues,getMultiData,getDischargeType,changePassword, requestVerify, requestResetPassword, gettypes_test, getdata_disease, getdata_emergency, getdata_resources, getdata_home, getDeptList, registerUser, verifyotp, resendOtp, loginUser, updateUser, updateUserTheme, validUser, getdata_lab,changeNewPassword }

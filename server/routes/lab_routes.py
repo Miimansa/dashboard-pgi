@@ -4,6 +4,32 @@ from flask_jwt_extended import jwt_required
 from flask_cors import CORS, cross_origin
 from SQL_Data.fetch_lab_data import fetch_lab_data_1,fetch_lab_data_2,fetch_lab_data_3
 from datetime import datetime
+import json
+import pandas as pd
+
+
+def get_patient_count_by_department_labtests(df,grouping_type,factor):
+    if df.empty:
+        return json.dumps({"message": "No data available"}, indent=2)
+
+    if(grouping_type=='monthly'):
+        df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m')
+    elif(grouping_type=='yearly'):
+            df['Date'] = pd.to_datetime(df['Date'], format='%Y')
+    # Group by Type and sum the Count
+    print(df)
+    grouped = df.groupby(factor)['Lab Record Count'].sum().reset_index()
+    
+    # Sort by Count in descending order
+    grouped = grouped.sort_values('Lab Record Count', ascending=False)
+    print(grouped)
+    result = [
+            {"name": row[factor], "value": int(row['Lab Record Count'])}
+            for _, row in df.iterrows()
+        ]
+
+
+    return result
 lab_bp = Blueprint('lab', __name__)
 
 @lab_bp.route('/', methods=['GET'])
@@ -82,3 +108,35 @@ def get_type():
 
     return lab_names
 
+@lab_bp.route('/lab-agg/', methods=['GET'])
+@jwt_required()
+def lab_agg():
+    # Get parameters from request
+    date_from = request.args.get('date_from')
+    date_to = request.args.get('date_to')
+    lab_type= request.args.get('type')
+    date_from = datetime.strptime(date_from, '%m-%d-%Y')
+    date_to = datetime.strptime(date_to, '%m-%d-%Y')
+    department_names = request.args.get('department_names', '').split(',')
+    factor = request.args.get('factor')
+    grouping_type = request.args.get('grouping_type', 'monthly').lower()
+    print(grouping_type)
+    if(grouping_type=='monthly'):
+        date_from=date_from.strftime('%m-%Y')
+        date_to=date_to.strftime('%m-%Y')
+    elif(grouping_type=='weekly'):
+        date_from=date_from.strftime('%Y-%m-%d %H:%M:%S')
+        date_to=date_to.strftime('%Y-%m-%d %H:%M:%S')
+    elif(grouping_type=='yearly'):
+        date_from=date_from.strftime('%Y')
+        date_to=date_to.strftime('%Y')
+    lab_data_1=fetch_lab_data_1(date_from, date_to, department_names, grouping_type,lab_type)
+    # Initialize the service (assuming similar logic to fetch lab data)
+    print(f"Labdata1 { lab_data_1}")
+
+
+
+    # Get the data
+    data = get_patient_count_by_department_labtests(lab_data_1, grouping_type,factor)
+
+    return jsonify(data) 

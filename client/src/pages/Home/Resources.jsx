@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import GroupedBarChartConn from "../Graphs/GroupedBarChartConn";
-import PieChart from "../Graphs/PieChart";
-import GroupedBarChart from "../Graphs/GroupedBarChart";
+import BloodGroupSelector from "../Graphs/BloodGroupFactorSelector";
 import Styles from './Resources.module.css'
 import { useDispatch, useSelector } from "react-redux";
 import LineChart from "../Graphs/LineChart";
@@ -140,11 +138,7 @@ const Resources = () => {
                                     />
                                 </div>
                                 <div className={Styles.down_upchild}>
-                                    <FlexiblePlotlyChart
-                                        data={formatDataForPieChart(data?.bloodPacketsUsedByBloodGroup)}
-                                        chartTitle={"Blood group wise"}
-                                        chartType={Userselection?.bio?.resources?.bloodPacketsUsedByBloodGroup?.SelectedType}
-                                    />
+                                    <BloodGroupSelector/>
                                 </div>
                             </div>
                             <div className={Styles.down_down}>

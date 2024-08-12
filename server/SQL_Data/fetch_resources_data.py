@@ -184,3 +184,75 @@ def fetch_resources_data_3(start_date, end_date, dept_names, grouping_func):
             conn.close()
     
     return resources_data_3
+
+def fetch_resources_data_4(start_date, end_date, dept_names, grouping_func,blood_groups):
+    print(blood_groups)
+    if grouping_func == 'monthly':
+        query = """
+        SELECT mv_dash_res_one_monthly.data_date,
+               hisdepartment.department_name AS dept_name,
+               mv_dash_res_one_monthly.bloodgroup,
+               mv_dash_res_one_monthly.b_count
+        FROM mv_dash_res_one_monthly 
+        INNER JOIN hisdepartment ON mv_dash_res_one_monthly.department = hisdepartment.department_id
+        WHERE TO_DATE(mv_dash_res_one_monthly.data_date, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')
+          AND TO_DATE(mv_dash_res_one_monthly.data_date, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
+          AND mv_dash_res_one_monthly.bloodgroup = ANY(%s)
+          AND hisdepartment.department_name = ANY(%s)
+        """
+    elif grouping_func == 'yearly':
+        query = """
+        SELECT mv_dash_res_one_yearly.data_date,
+               hisdepartment.department_name AS dept_name,
+               mv_dash_res_one_yearly.bloodgroup,
+               mv_dash_res_one_yearly.b_count
+        FROM mv_dash_res_one_yearly 
+        INNER JOIN hisdepartment ON mv_dash_res_one_yearly.department = hisdepartment.department_id 
+        WHERE TO_DATE(mv_dash_res_one_yearly.data_date, 'YYYY') >= TO_DATE(%s, 'YYYY')
+          AND TO_DATE(mv_dash_res_one_yearly.data_date, 'YYYY') <= TO_DATE(%s, 'YYYY')
+          AND mv_dash_res_one_yearly.bloodgroup = ANY(%s)
+          AND hisdepartment.department_name = ANY(%s)
+        """
+    elif grouping_func == 'weekly':
+         query = """
+        SELECT mv_dash_res_one_weekly.data_date,
+               hisdepartment.department_name AS dept_name,
+               mv_dash_res_one_weekly.bloodgroup,
+               mv_dash_res_one_weekly.b_count
+        FROM mv_dash_res_one_weekly 
+        INNER JOIN hisdepartment ON mv_dash_res_one_weekly.department = hisdepartment.department_id 
+        WHERE mv_dash_res_one_weekly.data_date >= %s
+          AND mv_dash_res_one_weekly.data_date <= %s
+          AND mv_dash_res_one_weekly.bloodgroup = ANY(%s)
+          AND hisdepartment.department_name = ANY(%s)
+        """
+        
+    elif grouping_func == 'daily':
+        # Add query for daily data if needed
+        raise NotImplementedError("Daily grouping is not implemented yet.")
+    else:
+        raise ValueError("Invalid grouping_func. Choose from 'monthly', 'weekly', 'yearly', or 'daily'.")
+
+    print(start_date)
+    print(end_date)
+    
+    resources_data_1 = pd.DataFrame()
+    try:
+        conn = psycopg2.connect(**db_params)
+        cur = conn.cursor()
+        print(f"Executed query:")
+        print(query)
+        dept_names = [dept.strip() for dept in dept_names]
+        print(cur.mogrify(query, (start_date, end_date,blood_groups, dept_names)).decode('utf-8'))
+        cur.execute(query, (start_date, end_date,blood_groups, dept_names))
+        rows = cur.fetchall()
+        resources_data_1 = pd.DataFrame(rows, columns=['Date', 'DepartmentName', 'Blood Group', 'Count'])
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+    
+    return resources_data_1

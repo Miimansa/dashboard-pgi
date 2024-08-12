@@ -10,6 +10,7 @@ import { formatDataForPieChart } from "../Functions_Files/file_functions";
 import { colourStyles } from "../Functions_Files/filters_data";
 import Select from 'react-select'
 import Switch from '@mui/material/Switch';
+import LabFactorSelector from "../Graphs/LabTypeAgg";
 import { message, Button,Select as AntSelect } from "antd";
 
 const { Option } = AntSelect;
@@ -44,6 +45,7 @@ const Labs = () => {
     const dispatch = useDispatch();
     console.log(selectedChart)
     console.log(showFullScreenChart)
+    console.log(typetest)
     useEffect(() => {
         setThemeKey(prevKey => prevKey + 1);
     }, [currentTheme]);
@@ -302,12 +304,8 @@ const Labs = () => {
                                     />
                                     <>
                                         {checked ?
-                                            <FlexiblePlotlyChart
-                                                data={formatDataForPieChart(data?.patient_count_by_department)}
-                                                chartTitle={"Lab Test wise lab orders"}
-                                                chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
-                                                key={`chart-${themeKey}`}
-                                            />
+                                            
+                                            <LabFactorSelector testTypes={typetest.map(item => item.label)} />
                                             :
                                             <FlexiblePlotlyChart
                                                 data={formatDataForPieChart(data?.patient_count_by_total_department)}

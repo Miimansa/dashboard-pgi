@@ -5,6 +5,33 @@ from datetime import datetime
 import psycopg2
 from config import Config
 from SQL_Data.fetch_emergency_data import fetch_emergency_data_1,fetch_emergency_data_2,fetch_emergency_data_3,fetch_emergency_data_4
+import json
+import pandas as pd
+
+
+def piedata(df,grouping_type,factor):
+    if df.empty:
+        return json.dumps({"message": "No data available"}, indent=2)
+
+    if(grouping_type=='monthly'):
+        df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m')
+    elif(grouping_type=='yearly'):
+            df['Date'] = pd.to_datetime(df['Date'], format='%Y')
+    # Group by Type and sum the Count
+    print(df)
+    grouped = df.groupby(factor)['Count'].sum().reset_index()
+    
+    # Sort by Count in descending order
+    grouped = grouped.sort_values('Count', ascending=False)
+    print(grouped)
+    result = [
+            {"name": row[factor], "value": int(row['Count'])}
+            for _, row in df.iterrows()
+        ]
+
+
+    return result
+
 emergency_bp=Blueprint('emergency',__name__)
 
 @emergency_bp.route('/',methods=['GET'])
@@ -73,3 +100,36 @@ def get_type():
                 conn.close()
 
         return lab_names
+
+@emergency_bp.route('/emergency-agg/', methods=['GET'])
+@jwt_required()
+def emergency_agg():
+    # Get parameters from request
+    date_from = request.args.get('date_from')
+    date_to = request.args.get('date_to')
+    discharge_type= request.args.get('type')
+    date_from = datetime.strptime(date_from, '%m-%d-%Y')
+    date_to = datetime.strptime(date_to, '%m-%d-%Y')
+    department_names = request.args.get('department_names', '').split(',')
+    factor = request.args.get('factor')
+    grouping_type = request.args.get('grouping_type', 'monthly').lower()
+    print(grouping_type)
+    if(grouping_type=='monthly'):
+        date_from=date_from.strftime('%m-%Y')
+        date_to=date_to.strftime('%m-%Y')
+    elif(grouping_type=='weekly'):
+        date_from=date_from.strftime('%Y-%m-%d %H:%M:%S')
+        date_to=date_to.strftime('%Y-%m-%d %H:%M:%S')
+    elif(grouping_type=='yearly'):
+        date_from=date_from.strftime('%Y')
+        date_to=date_to.strftime('%Y')
+    lab_data_1=fetch_emergency_data_2(date_from, date_to, department_names, grouping_type,discharge_type)
+    # Initialize the service (assuming similar logic to fetch lab data)
+    print(f"Labdata1 { lab_data_1}")
+
+
+
+    # Get the data
+    data = piedata(lab_data_1, grouping_type,factor)
+
+    return jsonify(data) 
