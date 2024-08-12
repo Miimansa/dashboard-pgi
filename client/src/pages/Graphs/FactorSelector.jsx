@@ -32,8 +32,12 @@ const FactorSelector = () => {
     setLoading(true);
     dispatch(setloading_text(true));
     try {
-      const res = await getMultiData(from_date, to_date, selectedDepartments, selectedGenders, selectedVisitTypes, factor, group, token);
-      setPieChartData(formatDataForPieChart(res.data));
+      if (selectedDepartments.length === 0 || selectedGenders.length === 0 || selectedVisitTypes.length === 0) {
+        setPieChartData([]);
+      } else {
+        const res = await getMultiData(from_date, to_date, selectedDepartments, selectedGenders, selectedVisitTypes, factor, group, token);
+        setPieChartData(formatDataForPieChart(res.data));
+      }
       setDisplayFactor(factor);
     } catch (error) {
       console.error('Error in fetching data:', error);
@@ -55,17 +59,31 @@ const FactorSelector = () => {
   };
   const getChartTitle = () => {
     const factorName = factor.charAt(0).toUpperCase() + factor.slice(1);
-    let departmentInfo = selectedDepartments.length === departments.length 
-      ? "All Departments" 
-      : `${selectedDepartments.length} Selected Department${selectedDepartments.length > 1 ? 's' : ''}`;
+    let departmentInfo = selectedDepartments.length === 0 
+      ? "No Departments" 
+      : selectedDepartments.length === departments.length 
+        ? "All Departments" 
+        : `${selectedDepartments.length} Selected Department${selectedDepartments.length > 1 ? 's' : ''}`;
     
-    let genderInfo = selectedGenders.length === 3 
-      ? "All Genders" 
-      : selectedGenders.join(', ');
+        let genderInfo = selectedGenders.length === 0
+        ? "No Genders"
+        : selectedGenders.length === 3 
+          ? "All Genders" 
+          : selectedGenders.map(sg => {
+              switch(sg) {
+                case 'M': return 'Males';
+                case 'F': return 'Females';
+                case 'O': return 'Others';
+                default: return sg;
+              }
+            }).join(', ');
+
     
-    let visitTypeInfo = selectedVisitTypes.length === 2 
-      ? "All Visit Types" 
-      : selectedVisitTypes.map(vt => vt === 'IP' ? 'Inpatients' : 'Outpatients').join(', ');
+    let visitTypeInfo = selectedVisitTypes.length === 0
+      ? "No Visit Types"
+      : selectedVisitTypes.length === 2 
+        ? "All Visit Types" 
+        : selectedVisitTypes.map(vt => vt === 'IP' ? 'Inpatients' : 'Outpatients').join(', ');
 
     let line1, line2;
     switch (factor) {
@@ -96,6 +114,7 @@ const FactorSelector = () => {
         <Title level={4}>{titleLine1}</Title>
         <Title level={5}>{titleLine2}</Title>
       </div>
+
 
     <div className={styles.container}>
       <div className={styles.leftPanel}>
