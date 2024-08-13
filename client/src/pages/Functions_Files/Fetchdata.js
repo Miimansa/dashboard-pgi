@@ -47,7 +47,7 @@ const getLabData = async (date_from, date_to, departments, testTypes, factor, gr
     }
 };
 const getDischargeData = async (date_from, date_to, departments, dischargeTypes, factor, groupingType, token) => {
-    const url = `${get_emergency_agg_url}/?date_from=${date_from}&date_to=${date_to}&department_names=${departments}&discharge_types=${dischargeTypes}&factor=${factor === 'department' ? 'DepartmentName' : 'dischargestatus'}&grouping_type=${groupingType}`;
+    const url = `${get_emergency_agg_url}/?date_from=${date_from}&date_to=${date_to}&department_names=${departments}&discharge_types=${dischargeTypes}&factor=${factor === 'department' ? 'DepartmentName' : 'Discharge_Status'}&grouping_type=${groupingType}`;
 
     try {
         const headers = {

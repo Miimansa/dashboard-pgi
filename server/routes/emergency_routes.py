@@ -107,7 +107,7 @@ def emergency_agg():
     # Get parameters from request
     date_from = request.args.get('date_from')
     date_to = request.args.get('date_to')
-    discharge_type= request.args.get('type')
+    discharge_type= request.args.get('discharge_types')
     date_from = datetime.strptime(date_from, '%m-%d-%Y')
     date_to = datetime.strptime(date_to, '%m-%d-%Y')
     department_names = request.args.get('department_names', '').split(',')

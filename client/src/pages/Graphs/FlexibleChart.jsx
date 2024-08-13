@@ -11,14 +11,30 @@ const FlexiblePlotlyChart = ({
   issmallfont
 }) => {
   
-  const GENDER_COLORS = {
-    'M': '#1f77b4',  // Blue
-    'F': '#e377c2',  // Pink
-    'O': '#2ca02c',
-    'Male': '#1f77b4',  // Blue
-    'Female': '#e377c2',  // Pink
-    'Others': '#2ca02c'  // Green
-  };
+  const LABEL_COLORS = {
+    // Gender colors
+    'M': '#3366cc',  // Dark blue
+    'F': '#dd4477',  // Dark red
+    'O': '#ff9900',  // Orange
+    'Male': '#3366cc',  // Dark blue
+    'Female': '#dd4477',  // Dark red
+    'Others': '#ff9900',  // Orange
+
+    // Department colors
+    'Surgical Gastroenterology': '#109618',  // Green
+    'Paediatric Gastroenterology': '#990099',  // Purple
+    'Gastroenterology': '#0099c6',  // Light blue
+    'Hematology': '#dc3912', // Pink
+    'Hepatology': '#66aa00',  // Lime green
+
+    // Visit/Admission types
+    'Total Visits': '#b82e2e',  // Dark red
+    'Total Admissions': '#316395',  // Navy blue
+    'Inpatient': '#994499',  // Dark purple
+    'Outpatient': '#22aa99',  // Teal
+    'IN': '#994499',  // Dark purple (same as Inpatient)
+    'OP': '#22aa99'   // Teal (same as Outpatient)
+};
   const getCssVariable = (variable) => getComputedStyle(document.documentElement).getPropertyValue(variable);
   
   if (!data || !(Array.isArray(data))) data = [];
@@ -51,7 +67,7 @@ const FlexiblePlotlyChart = ({
           name: series.name,
           type: chartType,
           mode: 'lines+markers',
-          marker: { color: GENDER_COLORS[series.name] }
+          marker: { color: LABEL_COLORS[series.name] }
         }));
       case 'bar':
       case 'groupedBar':
@@ -60,7 +76,7 @@ const FlexiblePlotlyChart = ({
           y: series.y,
           name: series.name,
           type: 'bar',
-          marker: { color: GENDER_COLORS[series.name] || undefined }
+          marker: { color: LABEL_COLORS[series.name] || undefined }
         }));
       case 'stackedBar':
         return data.map(series => ({
@@ -69,7 +85,7 @@ const FlexiblePlotlyChart = ({
           name: series.name,
           type: 'bar',
           stackgroup: 'one',
-          marker: { color: GENDER_COLORS[series.name] || undefined }
+          marker: { color: LABEL_COLORS[series.name] || undefined }
         }));
       case 'area':
         return data.map(series => ({
@@ -78,7 +94,8 @@ const FlexiblePlotlyChart = ({
           name: series.name,
           type: 'scatter',
           mode: 'lines',
-          fill: 'tozeroy'
+          fill: 'tozeroy',
+          marker: { color: LABEL_COLORS[series.name] || undefined }
         }));
       case 'pie':
       case 'donut':
@@ -89,7 +106,7 @@ const FlexiblePlotlyChart = ({
           textposition: 'inside',
           hole: chartType === 'donut' ? 0.4 : 0,
           marker: {
-            colors: data[0].labels.map(label => GENDER_COLORS[label])
+            colors: data[0].labels.map(label => LABEL_COLORS[label])
           },
           sort: false
         }];

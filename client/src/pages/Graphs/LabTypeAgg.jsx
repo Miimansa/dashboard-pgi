@@ -19,7 +19,7 @@ const LabFactorSelector = ({ testTypes }) => {
     const departments = department ? department.split(',').map(d => d.trim()) : [];
     const [loading, setLoading] = useState(false);
     const [selectedDepartments, setSelectedDepartments] = useState(departments);
-    const [selectedTestTypes, setSelectedTestTypes] = useState([]);
+    const [selectedTestTypes, setSelectedTestTypes] = useState(['Stem cell panel','Serum Magnesium']);
     const [factor, setFactor] = useState('department');
     const [groupingType, setGroupingType] = useState('Monthly');
     const [pieChartData, setPieChartData] = useState([]);

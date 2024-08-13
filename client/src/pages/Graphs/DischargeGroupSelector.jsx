@@ -21,7 +21,7 @@ const DischargeStatusSelector = ({ dischargeTypes }) => {
     const departments = department ? department.split(',').map(d => d.trim()) : [];
     const [loading, setLoading] = useState(false);
     const [selectedDepartments, setSelectedDepartments] = useState(departments);
-    const [selectedDischargeTypes, setSelectedDischargeTypes] = useState([]);
+    const [selectedDischargeTypes, setSelectedDischargeTypes] = useState(['Death','Normal Discharge']);
     const [factor, setFactor] = useState('department');
     const [groupingType, setGroupingType] = useState('Monthly');
     const [pieChartData, setPieChartData] = useState([]);
@@ -35,7 +35,7 @@ const DischargeStatusSelector = ({ dischargeTypes }) => {
             if (selectedDepartments.length === 0 || selectedDischargeTypes.length === 0) {
                 setPieChartData([]);
             } else {
-                const res = await getDischargeData(from_date, to_date, selectedDepartments.join(','), selectedDischargeTypes.join(','), 'Discharge Count', groupingType, token);
+                const res = await getDischargeData(from_date, to_date, selectedDepartments.join(','), selectedDischargeTypes.join(','),factor, groupingType, token);
                 setPieChartData(formatDataForPieChart(res.data));
             }
             setDisplayFactor(factor);
@@ -57,7 +57,7 @@ const DischargeStatusSelector = ({ dischargeTypes }) => {
         setFactor('department');
         setGroupingType('Monthly');
     };
-
+    console.log(factor)
     const getChartTitle = () => {
         const factorName = factor.charAt(0).toUpperCase() + factor.slice(1);
         let departmentInfo = selectedDepartments.length === 0 
@@ -139,21 +139,6 @@ const DischargeStatusSelector = ({ dischargeTypes }) => {
                             {dischargeTypes.map((type, index) => (
                                 <Option key={index} value={type}>{type}</Option>
                             ))}
-                        </Select>
-                    </div>
-
-                    <div className={styles.selectWrapper}>
-                        <div className={styles.labelWrapper}>
-                            <Text strong>Grouping Type</Text>
-                        </div>
-                        <Select
-                            value={groupingType}
-                            onChange={setGroupingType}
-                            className={styles.styledSelect}
-                            disabled={loading}
-                        >
-                            <Option value="Monthly">Monthly</Option>
-                            <Option value="Yearly">Yearly</Option>
                         </Select>
                     </div>
 

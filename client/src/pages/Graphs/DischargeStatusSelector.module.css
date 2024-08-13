@@ -6,7 +6,7 @@
   
   .leftPanel {
     width: 50%;
-    padding: 20px;
+    padding: 10px;
     overflow-y: auto;
   }
   
@@ -16,7 +16,7 @@
   }
   
   .selectWrapper {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
   
   .labelWrapper {
