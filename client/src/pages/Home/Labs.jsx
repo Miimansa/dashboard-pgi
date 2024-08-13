@@ -52,8 +52,8 @@ const Labs = () => {
 
     const handleChange = (e) => {
         setChecked(e.target.checked);
-        if (e.target.checked) message.info("Pie chart showing data for Gender Count")
-        else message.info("Pie chart showing data for Visits vs admissions count")
+        if (e.target.checked) message.info("Department wise lab patient count")
+        else message.info("Lab Count Aggregator")
     };
 
     const setSessionLabTypes = (types) => {

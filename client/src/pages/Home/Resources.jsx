@@ -98,51 +98,33 @@ const Resources = () => {
                     {showFullScreenChart && selectedChart !== 'None' ? (
                         selectedChart === "chart1" ? (
                             <FlexiblePlotlyChart
-                                data={data?.bloodUsedByDepartment}
-                                xAxisTitle={"Date"}
-                                yAxisTitle={"Blood Packets"}
-                                chartTitle={"Department wise Blood Packets count"}
-                                chartType={Userselection?.bio?.resources?.bloodUsedByDepartment?.SelectedType}
-                            />
-                        ) : selectedChart === "chart2" ? (
-                            <FlexiblePlotlyChart
-                                data={formatDataForPieChart(data?.bloodPacketsUsedByBloodGroup)}
-                                chartTitle={"Blood group wise"}
-                                chartType={Userselection?.bio?.resources?.bloodPacketsUsedByBloodGroup?.SelectedType}
-                            />
-                        ) : selectedChart === "chart3" ? (
-                            <FlexiblePlotlyChart
                                 data={data?.operationTheaterOccupancyByDepartment}
                                 chartTitle="Department wise  OT Requests"
                                 xAxisTitle="Date"
                                 yAxisTitle="Request Counts"
                                 chartType={Userselection?.bio?.resources?.operationTheaterOccupancyByDepartment?.SelectedType}
                             />
-                        ) : selectedChart === "chart4" ? (
+                            
+                        ) : selectedChart === "chart2" ? (
                             <FlexiblePlotlyChart
                                 data={formatDataForPieChart(data?.operationTheaterContributionByDepartment)}
                                 chartTitle="Department wise OT request"
                                 chartType={Userselection?.bio?.resources?.operationTheaterContributionByDepartment?.SelectedType}
                             />
-                        ) : null
+                        ) : selectedChart === "chart3" ? (
+                            <FlexiblePlotlyChart
+                                data={data?.bloodUsedByDepartment}
+                                xAxisTitle={"Date"}
+                                yAxisTitle={"Blood Packets"}
+                                chartTitle={"Department wise Blood Packets count"}
+                                chartType={Userselection?.bio?.resources?.bloodUsedByDepartment?.SelectedType}
+                            />
+                        )  : null
                     ) : (
                         <>
+                            
                             <div className={Styles.down_up}>
                                 <div className={Styles.down_upchild}>
-                                    <FlexiblePlotlyChart
-                                        data={data?.bloodUsedByDepartment}
-                                        xAxisTitle={"Date"}
-                                        yAxisTitle={"Blood Packets"}
-                                        chartTitle={"Department wise Blood Packets count"}
-                                        chartType={Userselection?.bio?.resources?.bloodUsedByDepartment?.SelectedType}
-                                    />
-                                </div>
-                                <div className={Styles.down_upchild}>
-                                    <BloodGroupSelector/>
-                                </div>
-                            </div>
-                            <div className={Styles.down_down}>
-                                <div className={Styles.down_downchild1}>
                                     <FlexiblePlotlyChart
                                         data={data?.operationTheaterOccupancyByDepartment}
                                         chartTitle="Department wise  OT Requests"
@@ -151,12 +133,26 @@ const Resources = () => {
                                         chartType={Userselection?.bio?.resources?.operationTheaterOccupancyByDepartment?.SelectedType}
                                     />
                                 </div>
-                                <div className={Styles.down_downchild2}>
+                                <div className={Styles.down_upchild}>
                                     <FlexiblePlotlyChart
                                         data={formatDataForPieChart(data?.operationTheaterContributionByDepartment)}
                                         chartTitle="Department wise OT request"
                                         chartType={Userselection?.bio?.resources?.operationTheaterContributionByDepartment?.SelectedType}
                                     />
+                                </div>
+                            </div>
+                            <div className={Styles.down_down}>
+                                <div className={Styles.down_downchild1}>
+                                    <FlexiblePlotlyChart
+                                        data={data?.bloodUsedByDepartment}
+                                        xAxisTitle={"Date"}
+                                        yAxisTitle={"Blood Packets"}
+                                        chartTitle={"Department wise Blood Packets count"}
+                                        chartType={Userselection?.bio?.resources?.bloodUsedByDepartment?.SelectedType}
+                                    />
+                                </div>
+                                <div className={Styles.down_downchild2}>
+                                    <BloodGroupSelector/>
                                 </div>
                             </div>
                         </>
