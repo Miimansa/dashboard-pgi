@@ -176,7 +176,6 @@ const Emergency = () => {
                                 <Option value="chart1">chart1</Option>
                                 <Option value="chart2">chart2</Option>
                                 <Option value="chart3">chart3</Option>
-                                <Option value="chart4">chart4</Option>
                                 <Option value="None">None</Option>
                             </AntSelect>
                             <Button onClick={handleViewChart}>View</Button>
@@ -211,14 +210,7 @@ const Emergency = () => {
                                     yAxisTitle="Patient count"
                                     chartType={Userselection?.bio?.emergency?.survivalDeathCounts?.SelectedType}
                                 />
-                            ) : selectedChart === "chart4" ? (
-                                <FlexiblePlotlyChart
-                                    key={`chart-${themeKey}`}
-                                    data={formatDataForPieChart(data?.genderDistribution)}
-                                    chartTitle="Discharge Status"
-                                    chartType={Userselection?.bio?.emergency?.genderDistribution?.SelectedType}
-                                />
-                            ) : null
+                            )  : null
                         ) : (
                             <>
                                 <div className={Styles.down_up}>
