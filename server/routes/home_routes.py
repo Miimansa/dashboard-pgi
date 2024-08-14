@@ -107,19 +107,29 @@ inner join hisdepartment on mv_dash_home_pie_monthly.depid = hisdepartment.depar
         date_trunc = 'week'
         date_format = 'DD/MM/YYYY'
         query = f"""
-            SELECT *
-            FROM mv_table_weekly
-            WHERE mv_table_weekly.dateData >= %s
-              AND mv_table_weekly.dateData <= %s
+select mv_dash_home_pie_weekly.data_month
+	, hisdepartment.department_name as dept_name
+	, mv_dash_home_pie_weekly.gender
+	, mv_dash_home_pie_weekly.visit_type
+	, mv_dash_home_pie_weekly.visit_count
+from mv_dash_home_pie_weekly 
+inner join hisdepartment on mv_dash_home_pie_weekly.depid = hisdepartment.department_id
+            WHERE mv_dash_home_pie_weekly.data_month >= %s
+              AND mv_dash_home_pie_weekly.data_month <=%s
         """
     elif grouping_type == 'yearly':
         date_trunc = 'year'
         date_format = 'YYYY'
         query = f"""
-            SELECT *
-            FROM mv_table_yearly
-            WHERE TO_DATE(mv_table_yearly.dateData, 'YYYY') >= TO_DATE(%s, 'YYYY')
-              AND TO_DATE(mv_table_yearly.dateData, 'YYYY') <= TO_DATE(%s, 'YYYY')
+select mv_dash_home_pie_yearly.data_month
+	, hisdepartment.department_name as dept_name
+	, mv_dash_home_pie_yearly.gender
+	, mv_dash_home_pie_yearly.visit_type
+	, mv_dash_home_pie_yearly.visit_count
+from mv_dash_home_pie_yearly 
+inner join hisdepartment on mv_dash_home_pie_yearly.depid = hisdepartment.department_id
+            WHERE TO_DATE(mv_dash_home_pie_yearly.data_month, 'YYYY') >= TO_DATE(%s, 'YYYY')
+              AND TO_DATE(mv_dash_home_pie_yearly.data_month, 'YYYY') <= TO_DATE(%s, 'YYYY')
         """
     else:
         return jsonify({"error": "Invalid grouping_type"}), 400
