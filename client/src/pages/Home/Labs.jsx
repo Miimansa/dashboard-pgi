@@ -185,6 +185,7 @@ const Labs = () => {
                                 <Option value="chart1">Chart 1</Option>
                                 <Option value="chart2">Chart 2</Option>
                                 <Option value="chart3">Chart 3</Option>
+                                <Option value="chart4">Chart 4</Option>
                                 <Option value="None">None</Option>
                             </AntSelect>
                             <Button onClick={handleViewChart}>View</Button>
@@ -238,12 +239,8 @@ const Labs = () => {
                             />
                             </>
                         ) : selectedChart === "chart4" ? (
-                            <FlexiblePlotlyChart
-                                data={formatDataForPieChart(checked ? data?.patient_count_by_department : data?.patient_count_by_total_department)}
-                                chartTitle={checked ? "Lab Test wise lab orders" : "Department wise lab orders"}
-                                chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
-                                key={`chart-${themeKey}`}
-                            />
+                            
+                            <LabFactorSelector testTypes={typetest.map(item => item.label)} />
                         ) : null
                     ) : (
                         <>

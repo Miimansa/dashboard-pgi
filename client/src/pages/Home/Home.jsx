@@ -151,6 +151,7 @@ const Home = () => {
                                 <Option value="chart1">Chart 1</Option>
                                 <Option value="chart2">Chart 2</Option>
                                 <Option value="chart3">Chart 3</Option>
+                                <Option value="chart4">Chart 4</Option>
                                 <Option value="None">None</Option>
                             </Select>
                             <Button onClick={handleViewChart}>View</Button>
@@ -188,7 +189,10 @@ const Home = () => {
                                         setSelectedBar(filteredData);
                                     }}
                                 />
-                            ) : null
+                            ): selectedChart === "chart4" ? (
+                                <FactorSelector />
+                            )
+                             : null
                         ) : (
                             <>
                                 <div className={Styles.down_up}>

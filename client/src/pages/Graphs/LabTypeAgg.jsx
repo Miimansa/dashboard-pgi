@@ -72,15 +72,15 @@ const LabFactorSelector = ({ testTypes }) => {
         let line1, line2;
         switch (factor) {
             case 'department':
-                line1 = `Department Lab Record Count`;
+                line1 = `Department Lab Wise Record Count`;
                 line2 = `for ${testTypeInfo}`;
                 break;
             case 'testType':
-                line1 = `Test Type Lab Record Count`;
+                line1 = `Test Type Wise Lab Record Count`;
                 line2 = `for ${departmentInfo}`;
                 break;
             default:
-                line1 = `${factorName} Lab Record Count`;
+                line1 = `${factorName} Lab Wise Record Count`;
                 line2 = '';
         }
         return [line1, line2];

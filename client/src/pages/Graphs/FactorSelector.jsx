@@ -88,19 +88,19 @@ const FactorSelector = () => {
     let line1, line2;
     switch (factor) {
       case 'department':
-        line1 = `Department Count`;
+        line1 = `Department Wise Count`;
         line2 = `for ${genderInfo} and ${visitTypeInfo}`;
         break;
       case 'gender':
-        line1 = `Gender Count`;
+        line1 = `Gender Wise Count`;
         line2 = `for ${departmentInfo} and ${visitTypeInfo}`;
         break;
       case 'visitType':
-        line1 = `Visit Type Count`;
+        line1 = `Visit Type Wise Count`;
         line2 = `for ${departmentInfo} and ${genderInfo}`;
         break;
       default:
-        line1 = `${factorName} Count`;
+        line1 = `${factorName} Wise Count`;
         line2 = '';
     }
     return [line1, line2];

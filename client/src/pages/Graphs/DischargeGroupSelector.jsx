@@ -75,15 +75,15 @@ const DischargeStatusSelector = ({ dischargeTypes }) => {
         let line1, line2;
         switch (factor) {
             case 'department':
-                line1 = `Department Discharge Count`;
+                line1 = `Department Wise Discharge Count`;
                 line2 = `for ${dischargeTypeInfo}`;
                 break;
             case 'dischargeType':
-                line1 = `Discharge Type Count`;
+                line1 = `Discharge Type Wise Count`;
                 line2 = `for ${departmentInfo}`;
                 break;
             default:
-                line1 = `${factorName} Discharge Count`;
+                line1 = `${factorName} Wise Discharge Count`;
                 line2 = '';
         }
         return [line1, line2];

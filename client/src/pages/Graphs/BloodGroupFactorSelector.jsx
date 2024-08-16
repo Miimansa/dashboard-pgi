@@ -81,7 +81,7 @@ const BloodGroupSelector = () => {
         ? "All Blood Groups" 
         : `${selectedBloodGroups.length} Selected Blood Group${selectedBloodGroups.length > 1 ? 's' : ''}`;
 
-    let line1 = `${factorName} Count`;
+    let line1 = `${factorName} wise Count`;
     let line2 = factor === 'DepartmentName' 
       ? `for ${bloodGroupInfo}` 
       : `for ${departmentInfo}`;
