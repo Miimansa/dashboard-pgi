@@ -168,3 +168,36 @@
     margin: auto;
     margin-bottom: 30px;
 }
+
+.colorSection {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.colorItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.colorButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.colorButtons button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.colorButtons button:hover {
+    background-color: #45a049;
+}

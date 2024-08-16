@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import styles from './Profile.module.css';
 import IMG from '../../assets/user.png';
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import DefaultDepartments from './DefaultDepartments';
 import { changeNewPassword } from '../Functions_Files/Fetchdata';
 import { message } from 'antd';
+
 const Profile = () => {
     const navigate = useNavigate();
     const user = useSelector((state) => (state.user.user));
@@ -25,6 +26,69 @@ const Profile = () => {
         confirmNewPassword: ''
     });
 
+    const [labelColors, setLabelColors] = useState(() => {
+        const savedColors = localStorage.getItem('labelColors');
+        return savedColors ? JSON.parse(savedColors) : {
+            'M': '#3366cc',
+            'F': '#dd4477',
+            'O': '#ff9900',
+            'Male': '#3366cc',
+            'Female': '#dd4477',
+            'Others': '#ff9900',
+            'Surgical Gastroenterology': '#109618',
+            'Paediatric Gastroenterology': '#990099',
+            'Gastroenterology': '#0099c6',
+            'Hematology': '#dc3912',
+            'Hepatology': '#66aa00',
+            'Total Visits': '#b82e2e',
+            'Total Admissions': '#316395',
+            'Inpatient': '#994499',
+            'Outpatient': '#22aa99',
+            'IN': '#994499',
+            'OP': '#22aa99'
+        };
+    });
+
+    useEffect(() => {
+        localStorage.setItem('labelColors', JSON.stringify(labelColors));
+    }, [labelColors]);
+
+    const handleColorChange = (label, color) => {
+        setLabelColors(prevColors => ({
+            ...prevColors,
+            [label]: color
+        }));
+    };
+
+    const resetColors = () => {
+        const defaultColors = {
+            'M': '#3366cc',
+            'F': '#dd4477',
+            'O': '#ff9900',
+            'Male': '#3366cc',
+            'Female': '#dd4477',
+            'Others': '#ff9900',
+            'Surgical Gastroenterology': '#109618',
+            'Paediatric Gastroenterology': '#990099',
+            'Gastroenterology': '#0099c6',
+            'Hematology': '#dc3912',
+            'Hepatology': '#66aa00',
+            'Total Visits': '#b82e2e',
+            'Total Admissions': '#316395',
+            'Inpatient': '#994499',
+            'Outpatient': '#22aa99',
+            'IN': '#994499',
+            'OP': '#22aa99'
+        };
+        setLabelColors(defaultColors);
+        localStorage.setItem('labelColors', JSON.stringify(defaultColors));
+        message.success('Colors reset to default');
+    };
+
+    const saveColors = () => {
+        localStorage.setItem('labelColors', JSON.stringify(labelColors));
+        message.success('Colors saved successfully');
+    };
     const handlePasswordChange = (e) => {
         setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
     };
@@ -131,8 +195,26 @@ const Profile = () => {
                  <DefaultDepartments />
             </div>
 
+            
             <div className={styles.rightDiv}>
                 <Graphfilter />
+                <div className={styles.colorSection}>
+                    <h3>Label Colors</h3>
+                    {Object.entries(labelColors).map(([label, color]) => (
+                        <div key={label} className={styles.colorItem}>
+                            <label>{label}:</label>
+                            <input
+                                type="color"
+                                value={color}
+                                onChange={(e) => handleColorChange(label, e.target.value)}
+                            />
+                        </div>
+                    ))}
+                    <div className={styles.colorButtons}>
+                        <button onClick={saveColors}>Save Colors</button>
+                        <button onClick={resetColors}>Reset to Default</button>
+                    </div>
+                </div>
             </div>
         </div>
     );

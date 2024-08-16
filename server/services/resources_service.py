@@ -144,7 +144,7 @@ class ResoucesServices:
         result = [
             {
                 "name": row['DepartmentName'],
-                "value": round(row['Contribution'], 2)  # Rounding to 2 decimal places
+                "value":  int(row['Count'])  # Rounding to 2 decimal places
             }
             for _, row in grouped.iterrows()
         ]
@@ -175,14 +175,14 @@ class ResoucesServices:
     
 
     def get_labels(self):
-        if self.resource_data_1.empty:
+        if self.resource_data_3.empty:
             return json.dumps({"message": "No Patient data available"}, indent=2)
-        dataframe = self.resource_data_1.copy()
+        dataframe = self.resource_data_3.copy()
         OT = dataframe["Count"].sum()
 
-        if self.resource_data_3.empty:
+        if self.resource_data_1.empty:
             return json.dumps({"message": "No data available for OT"}, indent=2)
-        dataframe2 = self.resource_data_3.copy()
+        dataframe2 = self.resource_data_1.copy()
         blood_count = dataframe2["Count"].sum()
         
         result = {
