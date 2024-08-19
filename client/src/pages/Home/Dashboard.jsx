@@ -26,7 +26,9 @@ const Dashboard = ({ Department_list }) => {
     // states for filters
     const [group_in, setGroup_in] = useState(option_groups[1]);
     console.log(group_in)
-    const [department_in, setDepartment_in] = useState();
+    
+    const department = useSelector((state) => state.filter.department) || '';
+    const [department_in, setDepartment_in] = useState(department);
     const [from_date_in, setFrom_date_in] = useState(new Date("2010-01-01"));
     const [to_date_in, setTo_date_in] = useState(new Date("2019-12-31"));
     const [active, setActive] = useState([false, false, false, false, false, false]);
@@ -44,7 +46,9 @@ const Dashboard = ({ Department_list }) => {
         dispatch(setGroup(defaultValues.group.name));
         dispatch(setFrom_date(defaultValues.from_date.toLocaleDateString('en-US')));
         dispatch(setTo_date(defaultValues.to_date.toLocaleDateString('en-US')));
-        dispatch(setDepartment(Department_list.join(", ")));
+        if (Department_list && Department_list.length > 0) {
+          dispatch(setDepartment(Department_list.join(", ")));
+        }
         setSearch(false);
       };
     // To collapse navbar
@@ -58,6 +62,7 @@ const Dashboard = ({ Department_list }) => {
     //For showing search bar
     const [search, setSearch] = useState(false);
     const searchonClick = () => setSearch(!search);
+
 
     //listning groupselection
     const groupSelection = (e) => {
@@ -146,7 +151,20 @@ const Dashboard = ({ Department_list }) => {
         const activeSections = section.filter((_, index) => active[index]);
         message.info(`Zooming to ${activeSections}`);
     };
-
+    useEffect(() => {
+        if (Department_list && Department_list.length > 0) {
+          const timer = setTimeout(() => {
+            resetFilters();
+          }, 2500); // 2.5 seconds
+      
+          return () => clearTimeout(timer);
+        }
+      }, [Department_list]);
+    
+    // useEffect to load data each time page is refreshed
+    useEffect(() => {
+        
+    }, []);
     return (<>
         <div className={Styles.container}>
             <Toaster />
