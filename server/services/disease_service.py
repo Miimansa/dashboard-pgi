@@ -3,7 +3,7 @@ import json
 from config import Config
 
 class DiseaseServices:
-    def __init__(self, disease_data_1, disease_data_2):
+    def f__init__(self, disease_data_1, disease_data_2):
         self.disease_data_1 = disease_data_1
         self.disease_data_2 = disease_data_2
         

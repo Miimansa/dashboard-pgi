@@ -9,7 +9,7 @@ from flask_cors import CORS, cross_origin
 
 @home_bp.route('/', methods=['GET'])
 @cross_origin(supports_credentials=True)
-@jwt_required()
+# @jwt_required()
 def home():
     # Fetch the data from PostgreSQL
 
@@ -37,12 +37,15 @@ def home():
     # fetching data from sql query
     home_data_1=fetch_home_data_1(date_from, date_to, department_names, grouping_type)
     home_data_2=fetch_home_data_2(date_from, date_to, department_names, grouping_type)
-    print(home_data_2)
+    print("###################################################################################################")
+    print(home_data_1,home_data_2)
+    print("###################################################################################################")
+    
     home_service = HomeService(home_data_1,home_data_2,label_data)
 
     # Get the data
     data = home_service.get_all_home_data(date_from, date_to, department_names, grouping_type)
-    # print(data)
+    print(data)
     return jsonify(data)
 import psycopg2
 from config import Config

@@ -26,7 +26,7 @@ const Dashboard = ({ Department_list }) => {
     // states for filters
     const [group_in, setGroup_in] = useState(option_groups[1]);
     console.log(group_in)
-    
+
     const department = useSelector((state) => state.filter.department) || '';
     const [department_in, setDepartment_in] = useState(department);
     const [from_date_in, setFrom_date_in] = useState(new Date("2010-01-01"));
@@ -37,8 +37,8 @@ const Dashboard = ({ Department_list }) => {
         department: Department_list ? Department_list.map(item => ({ label: item, value: item })) : [],
         from_date: new Date("2010-01-01"),
         to_date: new Date("2019-12-31")
-      };
-      const resetFilters = () => {
+    };
+    const resetFilters = () => {
         setGroup_in(defaultValues.group);
         setDepartment_in(defaultValues.department);
         setFrom_date_in(defaultValues.from_date);
@@ -47,10 +47,10 @@ const Dashboard = ({ Department_list }) => {
         dispatch(setFrom_date(defaultValues.from_date.toLocaleDateString('en-US')));
         dispatch(setTo_date(defaultValues.to_date.toLocaleDateString('en-US')));
         if (Department_list && Department_list.length > 0) {
-          dispatch(setDepartment(Department_list.join(", ")));
+            dispatch(setDepartment(Department_list.join(", ")));
         }
         setSearch(false);
-      };
+    };
     // To collapse navbar
     const [hide, setHide] = useState(false);
     const hideonclick = () => setHide(!hide);
@@ -153,17 +153,17 @@ const Dashboard = ({ Department_list }) => {
     };
     useEffect(() => {
         if (Department_list && Department_list.length > 0) {
-          const timer = setTimeout(() => {
-            resetFilters();
-          }, 2500); // 2.5 seconds
-      
-          return () => clearTimeout(timer);
+            const timer = setTimeout(() => {
+                resetFilters();
+            }, 2500); // 2.5 seconds
+
+            return () => clearTimeout(timer);
         }
-      }, [Department_list]);
-    
+    }, [Department_list]);
+
     // useEffect to load data each time page is refreshed
     useEffect(() => {
-        
+
     }, []);
     return (<>
         <div className={Styles.container}>
@@ -317,7 +317,7 @@ const Dashboard = ({ Department_list }) => {
                                                 placeholderText="End Date"
                                                 className={Styles.datepicker}
                                                 minDate={new Date("2010-01-01")}
-                                                maxDate={new Date("2019-12-31")}
+                                                maxDate={new Date("2500-12-31")}
                                             />
                                         </div>
 
@@ -332,13 +332,13 @@ const Dashboard = ({ Department_list }) => {
                                             />
                                         </div>
                                         <div className={Styles.search_button}>
-                                        <button onClick={setValues}> <FaSearchPlus /> Search</button>
-                                        <button onClick={resetFilters}>Reset</button>
-                                        <button onClick={() => setSearch(false)}>X</button>
+                                            <button onClick={setValues}> <FaSearchPlus /> Search</button>
+                                            <button onClick={resetFilters}>Reset</button>
+                                            <button onClick={() => setSearch(false)}>X</button>
                                         </div>
                                     </div>
-                                    
-                                    
+
+
                                 </div>
                         }
                         <div className={Styles.profile} ><MenuSimple />

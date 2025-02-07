@@ -7,6 +7,7 @@ import datetime
 from sqlalchemy.dialects.postgresql import JSONB
 
 class User(db.Model):
+    __table_args__ = {"schema": "abc"}  # Add this line
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -18,11 +19,11 @@ class User(db.Model):
     is_verified = db.Column(db.Boolean, default=False)
     theme = db.Column(db.String(50), default='default')
     default_departments = db.Column(JSONB, default=[
-        "Surgical Gastroenterology",
-        "Paediatric Gastroenterology",
-        "Gastroenterology",
-        "Hematology",
-        "Hepatology"
+        "Neurologic Surgical - surgical, relating to the brain",
+        "Cardiac Surgery - for surgical cardiac admissions",
+        "Trauma - injury or damage caused by physical harm from an external",
+        "Newborn - infants born at the hospital",
+        "Orthopaedic medicine - non-surgical, relating to musculoskeletal system"
     ])
     default_labtypes = db.Column(JSONB, default=[])
     default_dischargestatus = db.Column(JSONB, default=[

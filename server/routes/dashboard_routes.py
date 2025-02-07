@@ -16,7 +16,8 @@ def dashboard():
         'host': Config.DB_HOST
     }
 
-    query = "SELECT department_name FROM HISDEPARTMENT where department_id in (28,8,27,5,110928387);"
+    query = "SELECT DISTINCT care_site_name FROM care_site LIMIT 5"
+    # query = "SELECT department_name FROM HISDEPARTMENT where department_id in (28,8,27,5,110928387);"
     
     conn = None
     cur = None

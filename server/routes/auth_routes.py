@@ -19,11 +19,12 @@ def register():
         return jsonify(err.messages), 400
 
     try:
-        print(data)
         hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
         with open('./data/selectedcharts.json', 'r') as f:
             bio_data = json.load(f)
-        new_user = User(username=data['username'], email=data['email'], password=hashed_password,bio=bio_data,full_name=data['full_name'])
+        # Convert bio_data to a JSON string
+        bio_json = json.dumps(bio_data)  
+        new_user = User(username=data['username'], email=data['email'], password=hashed_password,bio=bio_json,full_name=data['full_name'])
         db.session.add(new_user)
         otp = generate_otp()
         new_user.set_otp(otp)
@@ -36,7 +37,7 @@ def register():
         return jsonify({"message": "Username or email already exists"}), 409
     except Exception as e:
         db.session.rollback()
-        print(e)
+        print("Here is an error:,",e)
         return jsonify({"message": "An error occurred while registering user"}), 500
 
 
