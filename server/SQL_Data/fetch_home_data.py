@@ -45,15 +45,28 @@ ORDER BY v.data_date;
         """
     elif grouping_func == 'weekly':
         query = f"""
-       select mv_dash_home_one_weekly.data_month as data_date
-	, mv_dash_home_one_weekly.count as patient_count
-	, mv_dash_home_one_weekly.gender
-	, hisdepartment.department_name as dept_name
-from mv_dash_home_one_weekly 
-inner join hisdepartment on mv_dash_home_one_weekly.depid = hisdepartment.department_id
-WHERE  mv_dash_home_one_weekly.data_month >= %s
-          AND mv_dash_home_one_weekly.data_month <= %s
-          AND hisdepartment.department_name = ANY(%s)
+SELECT 
+    v.data_date, 
+    v.count::INTEGER AS patient_count,  -- Ensure INT conversion
+    v.gender,
+    care_site.care_site_name AS dept_name
+FROM (
+    SELECT 
+        date_trunc('week',visit_occurrence.visit_start_date) AS data_date,  -- Ensure proper formatting
+        person.gender_source_value AS gender, 
+        COUNT(*)::INTEGER AS count,  -- Ensure INT conversion
+        COALESCE(visit_occurrence.care_site_id, 24473) AS depid
+    FROM visit_occurrence 
+    INNER JOIN person ON visit_occurrence.person_id = person.person_id
+    GROUP BY date_trunc('week',visit_occurrence.visit_start_date), 
+             person.gender_source_value, 
+             visit_occurrence.care_site_id
+) v 
+INNER JOIN care_site ON v.depid = care_site.care_site_id
+WHERE  v.data_date >= %s
+          AND v.data_date  <= %s
+          AND care_site.care_site_name = ANY(%s)
+order by 1
         """
     elif grouping_func == 'yearly':
         query = f"""
@@ -153,15 +166,26 @@ order by 1
     elif grouping_func == 'weekly':
         date_trunc = 'week'
         date_format = 'DD/MM/YYYY'
-        query = f"""select mv_dash_home_two_weekly.data_date
-	, mv_dash_home_two_weekly.admission_count
-	, mv_dash_home_two_weekly.visit_count
-	, hisdepartment.department_name as dept_name
-from mv_dash_home_two_weekly 
-inner join hisdepartment on mv_dash_home_two_weekly.depid = hisdepartment.department_id
-WHERE  mv_dash_home_two_weekly.data_date >= %s
-          AND mv_dash_home_two_weekly.data_date <= %s
-          AND hisdepartment.department_name = ANY(%s)
+        query = f"""SELECT 
+    v.data_date, 
+    v.visit_count,
+    v.admission_count,
+    care_site.care_site_name as dept_name
+FROM (
+    SELECT 
+        to_char(visit_start_date, 'YYYY-MM') AS data_date, 
+        COUNT(*) AS visit_count,
+        SUM(CASE WHEN visit_concept_id = 32217 THEN 1 ELSE 0 END) AS admission_count,
+        COALESCE(visit_occurrence.care_site_id, 24473) AS depid
+    FROM visit_occurrence 
+    WHERE visit_concept_id IN (32217, 9203)
+    GROUP BY to_char(visit_start_date, 'YYYY-MM'), visit_occurrence.care_site_id
+) v 
+INNER JOIN care_site ON v.depid = care_site.care_site_id 
+          WHERE  v.data_date >= %s
+          AND v.data_date  <= %s
+          AND care_site.care_site_name = ANY(%s)
+order by 1
     """
     elif grouping_func == 'yearly':
         date_trunc = 'year'

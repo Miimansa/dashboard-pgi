@@ -126,15 +126,29 @@ AND TO_DATE(v.data_month, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
         date_trunc = 'week'
         date_format = 'DD/MM/YYYY'
         query = f"""
-select mv_dash_home_pie_weekly.data_month
-	, hisdepartment.department_name as dept_name
-	, mv_dash_home_pie_weekly.gender
-	, mv_dash_home_pie_weekly.visit_type
-	, mv_dash_home_pie_weekly.visit_count
-from mv_dash_home_pie_weekly 
-inner join hisdepartment on mv_dash_home_pie_weekly.depid = hisdepartment.department_id
-            WHERE mv_dash_home_pie_weekly.data_month >= %s
-              AND mv_dash_home_pie_weekly.data_month <=%s
+SELECT 
+    v.data_month, 
+    care_site.care_site_name AS dept_name,
+    v.gender,
+    v.visit_type,
+    v.visit_count
+
+FROM (
+    SELECT 
+            to_char(visit_start_date, 'YYYY-MM') AS data_month, 
+            person.gender_source_value as gender,
+            COUNT(*) AS visit_count,
+            COALESCE(visit_occurrence.care_site_id, 24473) AS depid,
+            visit_concept_id as visit_type
+    FROM visit_occurrence 
+    inner join
+    person
+    on visit_occurrence.person_id = person.person_id
+    group by data_month ,depid,visit_type,gender
+) v 
+INNER JOIN care_site ON v.depid = care_site.care_site_id
+            WHERE v.data_month >= %s
+              AND v.data_month <=%s
         """
     elif grouping_type == 'yearly':
         date_trunc = 'year'
