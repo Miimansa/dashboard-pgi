@@ -72,6 +72,9 @@ def get_visit():
     departments = request.args.get('departments')
     genders = request.args.get('genders')
     visit_types = request.args.get('visitTypes')
+    if(visit_types):
+        visit_types = "32217,9203,0,44797555"
+
     factor = request.args.get('factor')
     grouping_type = request.args.get('grouping_type', 'monthly').lower()
     if(grouping_type=='monthly'):
@@ -86,7 +89,6 @@ def get_visit():
     # Validate the factor
     if factor not in ['department', 'gender', 'visitType']:
         return jsonify({"error": "Invalid factor"}), 400
-    print("HER")
     # Initialize query variables
     query = ""
     date_format = ""
@@ -96,15 +98,29 @@ def get_visit():
         date_trunc = 'month'
         date_format = '%b %Y'
         query = f"""
-select mv_dash_home_pie_monthly.data_month
-	, hisdepartment.department_name as dept_name
-	, mv_dash_home_pie_monthly.gender
-	, mv_dash_home_pie_monthly.visit_type
-	, mv_dash_home_pie_monthly.visit_count
-from mv_dash_home_pie_monthly 
-inner join hisdepartment on mv_dash_home_pie_monthly.depid = hisdepartment.department_id
-            WHERE TO_DATE(mv_dash_home_pie_monthly.data_month, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')
-              AND TO_DATE(mv_dash_home_pie_monthly.data_month, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
+SELECT 
+    v.data_month, 
+    care_site.care_site_name AS dept_name,
+    v.gender,
+    v.visit_type,
+    v.visit_count
+
+FROM (
+    SELECT 
+            to_char(visit_start_date, 'YYYY-MM') AS data_month, 
+            person.gender_source_value as gender,
+            COUNT(*) AS visit_count,
+            COALESCE(visit_occurrence.care_site_id, 24473) AS depid,
+            visit_concept_id as visit_type
+    FROM visit_occurrence 
+    inner join
+    person
+    on visit_occurrence.person_id = person.person_id
+    group by data_month ,depid,visit_type,gender
+) v 
+INNER JOIN care_site ON v.depid = care_site.care_site_id
+WHERE TO_DATE(v.data_month, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')  
+AND TO_DATE(v.data_month, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
         """
     elif grouping_type == 'weekly':
         date_trunc = 'week'
@@ -124,22 +140,34 @@ inner join hisdepartment on mv_dash_home_pie_weekly.depid = hisdepartment.depart
         date_trunc = 'year'
         date_format = 'YYYY'
         query = f"""
-select mv_dash_home_pie_yearly.data_month
-	, hisdepartment.department_name as dept_name
-	, mv_dash_home_pie_yearly.gender
-	, mv_dash_home_pie_yearly.visit_type
-	, mv_dash_home_pie_yearly.visit_count
-from mv_dash_home_pie_yearly 
-inner join hisdepartment on mv_dash_home_pie_yearly.depid = hisdepartment.department_id
-            WHERE TO_DATE(mv_dash_home_pie_yearly.data_month, 'YYYY') >= TO_DATE(%s, 'YYYY')
-              AND TO_DATE(mv_dash_home_pie_yearly.data_month, 'YYYY') <= TO_DATE(%s, 'YYYY')
+SELECT 
+    v.data_month, 
+    care_site.care_site_name AS dept_name,
+    v.gender,
+    v.visit_type,
+    v.visit_count
+
+FROM (
+    SELECT 
+            to_char(visit_start_date, 'YYYY') AS data_month, 
+            person.gender_source_value as gender,
+            COUNT(*) AS visit_count,
+            COALESCE(visit_occurrence.care_site_id, 24473) AS depid,
+            visit_concept_id as visit_type
+    FROM visit_occurrence 
+    inner join
+    person
+    on visit_occurrence.person_id = person.person_id
+    group by data_month ,depid,visit_type,gender
+) v 
+INNER JOIN care_site ON v.depid = care_site.care_site_id
+WHERE TO_DATE(v.data_month, 'YYYY') >= TO_DATE(%s, 'YYYY')  
+AND TO_DATE(v.data_month, 'YYYY') <= TO_DATE(%s, 'YYYY')
         """
     else:
         return jsonify({"error": "Invalid grouping_type"}), 400
 
     try:
-        print("SDFd")
-
         # Establish database connection
         conn = psycopg2.connect(**db_params)
         cur = conn.cursor()
@@ -148,20 +176,20 @@ inner join hisdepartment on mv_dash_home_pie_yearly.depid = hisdepartment.depart
         params = [date_from, date_to]
 
         if departments:
-            query += " AND hisdepartment.department_name IN %s"
+            query += " AND care_site.care_site_name IN %s"
             params.append(tuple(departments.split(',')))
 
         if genders:
-            query += " AND Gender IN %s"
+            query += " AND gender IN %s"
             params.append(tuple(genders.split(',')))
 
         if visit_types:
-            query += " AND Visit_Type IN %s"
+            query += " AND visit_type IN %s"
             params.append(tuple(visit_types.split(',')))
-
+        query+= "ORDER BY v.data_month;"
         # Group by factor and execute the query
-
         print(query)
+        print(params)
         print(cur.mogrify(query, params).decode('utf-8'))
         cur.execute(query, params)
         rows = cur.fetchall()
