@@ -135,7 +135,7 @@ SELECT
 
 FROM (
     SELECT 
-            to_char(visit_start_date, 'YYYY-MM') AS data_month, 
+            date_trunc('week',visit_occurrence.visit_start_date) AS data_month, 
             person.gender_source_value as gender,
             COUNT(*) AS visit_count,
             COALESCE(visit_occurrence.care_site_id, 24473) AS depid,

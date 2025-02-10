@@ -161,7 +161,7 @@ INNER JOIN care_site ON v.depid = care_site.care_site_id
             WHERE TO_DATE(v.data_date, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')
           AND TO_DATE(v.data_date, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
           AND care_site.care_site_name = ANY(%s)
-order by 1
+order by v.data_date
     """
     elif grouping_func == 'weekly':
         date_trunc = 'week'
@@ -173,13 +173,13 @@ order by 1
     care_site.care_site_name as dept_name
 FROM (
     SELECT 
-        to_char(visit_start_date, 'YYYY-MM') AS data_date, 
+        date_trunc('week',visit_occurrence.visit_start_date) AS data_date, 
         COUNT(*) AS visit_count,
         SUM(CASE WHEN visit_concept_id = 32217 THEN 1 ELSE 0 END) AS admission_count,
         COALESCE(visit_occurrence.care_site_id, 24473) AS depid
     FROM visit_occurrence 
     WHERE visit_concept_id IN (32217, 9203)
-    GROUP BY to_char(visit_start_date, 'YYYY-MM'), visit_occurrence.care_site_id
+    GROUP BY date_trunc('week',visit_occurrence.visit_start_date), visit_occurrence.care_site_id
 ) v 
 INNER JOIN care_site ON v.depid = care_site.care_site_id 
           WHERE  v.data_date >= %s
