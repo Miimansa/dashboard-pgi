@@ -84,12 +84,22 @@ def get_type():
     try:
         conn = psycopg2.connect(**db_params)
         cur = conn.cursor()
-        query = """ SELECT DISTINCT lab_service_name 
-            FROM (
-                SELECT lab_service_name 
-                FROM mv_dash_lab_one_monthly 
-                ORDER BY lr_count DESC
-            ) AS subquery"""
+        query = """
+    select distinct lab_service_name from
+        (
+            select to_char(m.measurement_date, 'YYYY-MM') AS data_month,
+            COALESCE(v.care_site_id, 24473) AS department,
+            c.concept_id as lab_service_id,
+            c.concept_name as lab_service_name,
+            count(*) as lr_count from 
+            measurements as m inner join visit_occurrence as v
+            on m.visit_occurrence_id = v.visit_occurrence_id
+            inner join concept as c
+            on m.measurement_concept_id = c.concept_id 
+            group by data_month,department,lab_service_id,lab_service_name
+            ORDER BY lr_count DESC
+        ) as subquery
+"""
         cur.execute(query)
         rows = cur.fetchall()
         

@@ -151,7 +151,7 @@ FROM (
     SELECT 
         to_char(visit_start_date, 'YYYY-MM') AS data_date, 
         COUNT(*) AS visit_count,
-        SUM(CASE WHEN visit_concept_id = 32217 THEN 1 ELSE 0 END) AS admission_count,
+        SUM(CASE WHEN visit_concept_id = 32217 THEN 1 ELSE 0 END) AS admission_count, 
         COALESCE(visit_occurrence.care_site_id, 24473) AS depid
     FROM visit_occurrence 
     WHERE visit_concept_id IN (32217, 9203)

@@ -19,7 +19,7 @@ const LabFactorSelector = ({ testTypes }) => {
     const departments = department ? department.split(',').map(d => d.trim()) : [];
     const [loading, setLoading] = useState(false);
     const [selectedDepartments, setSelectedDepartments] = useState(departments);
-    const [selectedTestTypes, setSelectedTestTypes] = useState(['Stem cell panel','Serum Magnesium']);
+    const [selectedTestTypes, setSelectedTestTypes] = useState(['Amlodipine 10 MG Delayed Release Oral Tablet [Istin] by Waymade', 'Amlodipine 10 MG Delayed Release Oral Tablet by Arrow Generics']);
     const [factor, setFactor] = useState('department');
     const [groupingType, setGroupingType] = useState('Monthly');
     const [pieChartData, setPieChartData] = useState([]);
@@ -33,7 +33,7 @@ const LabFactorSelector = ({ testTypes }) => {
             if (selectedDepartments.length === 0 || selectedTestTypes.length === 0) {
                 setPieChartData([]);
             } else {
-                const res = await getLabData(from_date, to_date, selectedDepartments.join(','), selectedTestTypes.join(','),factor, groupingType, token);
+                const res = await getLabData(from_date, to_date, selectedDepartments.join(','), selectedTestTypes.join(','), factor, groupingType, token);
                 setPieChartData(formatDataForPieChart(res.data));
             }
             setDisplayFactor(factor);
@@ -57,16 +57,16 @@ const LabFactorSelector = ({ testTypes }) => {
 
     const getChartTitle = () => {
         const factorName = factor.charAt(0).toUpperCase() + factor.slice(1);
-        let departmentInfo = selectedDepartments.length === 0 
-            ? "No Departments" 
-            : selectedDepartments.length === departments.length 
-                ? "All Departments" 
+        let departmentInfo = selectedDepartments.length === 0
+            ? "No Departments"
+            : selectedDepartments.length === departments.length
+                ? "All Departments"
                 : `${selectedDepartments.length} Selected Department${selectedDepartments.length > 1 ? 's' : ''}`;
-        
+
         let testTypeInfo = selectedTestTypes.length === 0
             ? "No Test Types"
-            : selectedTestTypes.length === testTypes.length 
-                ? "All Test Types" 
+            : selectedTestTypes.length === testTypes.length
+                ? "All Test Types"
                 : `${selectedTestTypes.length} Selected Test Type${selectedTestTypes.length > 1 ? 's' : ''}`;
 
         let line1, line2;
@@ -140,16 +140,16 @@ const LabFactorSelector = ({ testTypes }) => {
                     </div>
 
                     <div className={styles.buttonGroup}>
-                        <Button 
-                            type="primary" 
-                            icon={<SearchOutlined />} 
-                            onClick={fetchData} 
+                        <Button
+                            type="primary"
+                            icon={<SearchOutlined />}
+                            onClick={fetchData}
                             className={styles.iconButton}
                             disabled={loading}
                         />
-                        <Button 
-                            icon={<UndoOutlined />} 
-                            onClick={handleReset} 
+                        <Button
+                            icon={<UndoOutlined />}
+                            onClick={handleReset}
                             className={styles.iconButton}
                             disabled={loading}
                         />
