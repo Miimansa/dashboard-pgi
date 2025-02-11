@@ -144,8 +144,8 @@ def fetch_home_data_2(start_date, end_date, dept_names, grouping_func):
         date_format = 'Mon YYYY'
         query = f"""SELECT 
     v.data_date, 
-    v.visit_count,
     v.admission_count,
+    v.visit_count,
     care_site.care_site_name as dept_name
 FROM (
     SELECT 
@@ -168,8 +168,8 @@ order by v.data_date
         date_format = 'DD/MM/YYYY'
         query = f"""SELECT 
     v.data_date, 
-    v.visit_count,
     v.admission_count,
+    v.visit_count,
     care_site.care_site_name as dept_name
 FROM (
     SELECT 
@@ -192,8 +192,8 @@ order by 1
         date_format = 'YYYY'
         query =  f"""SELECT 
     v.data_date, 
-    v.visit_count,
     v.admission_count,
+    v.visit_count,
     care_site.care_site_name as dept_name
 FROM (
     SELECT 

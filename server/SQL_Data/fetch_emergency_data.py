@@ -192,42 +192,75 @@ def fetch_emergency_data_4(start_date, end_date, dept_names, grouping_func):
     if grouping_func == 'monthly':
         date_trunc = 'month'
         date_format = 'Mon YYYY'
-        query = f"""select mv_dash_home_two.data_date
-        , mv_dash_home_two.admission_count
-        , mv_dash_home_two.visit_count
-        , hisdepartment.department_name as dept_name
-    from mv_dash_home_two 
-    inner join hisdepartment on mv_dash_home_two.depid = hisdepartment.department_id
-            WHERE TO_DATE(mv_dash_home_two.data_date, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')
-          AND TO_DATE(mv_dash_home_two.data_date, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
-          AND hisdepartment.department_name = ANY(%s);
+        query = f"""SELECT 
+    v.data_date, 
+    v.admission_count,
+    v.visit_count,
+    care_site.care_site_name as dept_name
+FROM (
+    SELECT 
+        to_char(visit_start_date, 'YYYY-MM') AS data_date, 
+        COUNT(*) AS visit_count,
+        SUM(CASE WHEN visit_concept_id = 32217 THEN 1 ELSE 0 END) AS admission_count, 
+        COALESCE(visit_occurrence.care_site_id, 24473) AS depid
+    FROM visit_occurrence 
+    WHERE visit_concept_id IN (32217, 9203)
+    GROUP BY to_char(visit_start_date, 'YYYY-MM'), visit_occurrence.care_site_id
+) v 
+INNER JOIN care_site ON v.depid = care_site.care_site_id 
+            WHERE TO_DATE(v.data_date, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')
+          AND TO_DATE(v.data_date, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
+          AND care_site.care_site_name = ANY(%s)
+order by v.data_date
     """
     elif grouping_func == 'weekly':
         date_trunc = 'week'
         date_format = 'DD/MM/YYYY'
-        query = f"""select mv_dash_home_two_weekly.data_date
-	, mv_dash_home_two_weekly.admission_count
-	, mv_dash_home_two_weekly.visit_count
-	, hisdepartment.department_name as dept_name
-from mv_dash_home_two_weekly 
-inner join hisdepartment on mv_dash_home_two_weekly.depid = hisdepartment.department_id
-WHERE  mv_dash_home_two_weekly.data_date >= %s
-          AND mv_dash_home_two_weekly.data_date <= %s
-          AND hisdepartment.department_name = ANY(%s)
+        query = f"""SELECT 
+    v.data_date, 
+    v.admission_count,
+    v.visit_count,
+    care_site.care_site_name as dept_name
+FROM (
+    SELECT 
+        date_trunc('week',visit_occurrence.visit_start_date) AS data_date, 
+        COUNT(*) AS visit_count,
+        SUM(CASE WHEN visit_concept_id = 32217 THEN 1 ELSE 0 END) AS admission_count,
+        COALESCE(visit_occurrence.care_site_id, 24473) AS depid
+    FROM visit_occurrence 
+    WHERE visit_concept_id IN (32217, 9203)
+    GROUP BY date_trunc('week',visit_occurrence.visit_start_date), visit_occurrence.care_site_id
+) v 
+INNER JOIN care_site ON v.depid = care_site.care_site_id 
+          WHERE  v.data_date >= %s
+          AND v.data_date  <= %s
+          AND care_site.care_site_name = ANY(%s)
+order by 1
     """
     elif grouping_func == 'yearly':
         date_trunc = 'year'
         date_format = 'YYYY'
-        query =  f"""select mv_dash_home_two_yearly.data_date
-, mv_dash_home_two_yearly.admission_count
-, mv_dash_home_two_yearly.visit_count
-, hisdepartment.department_name as dept_name
-from mv_dash_home_two_yearly
-inner join hisdepartment on mv_dash_home_two_yearly.depid = hisdepartment.department_id
-        WHERE TO_DATE(mv_dash_home_two_yearly.data_date, 'YYYY') >= TO_DATE(%s, 'YYYY')
-          AND TO_DATE(mv_dash_home_two_yearly.data_date, 'YYYY') <= TO_DATE(%s, 'YYYY')
-          AND hisdepartment.department_name = ANY(%s)
-    """
+        query =  f"""SELECT 
+            v.data_date, 
+            v.admission_count,
+            v.visit_count,
+            care_site.care_site_name as dept_name
+        FROM (
+            SELECT 
+                to_char(visit_start_date, 'YYYY') AS data_date, 
+                COUNT(*) AS visit_count,
+                SUM(CASE WHEN visit_concept_id = 32217 THEN 1 ELSE 0 END) AS admission_count,
+                COALESCE(visit_occurrence.care_site_id, 24473) AS depid
+            FROM visit_occurrence 
+            WHERE visit_concept_id IN (32217, 9203)
+            GROUP BY to_char(visit_start_date, 'YYYY'), visit_occurrence.care_site_id
+        ) v 
+        INNER JOIN care_site ON v.depid = care_site.care_site_id 
+                    WHERE TO_DATE(v.data_date, 'YYYY') >= TO_DATE(%s, 'YYYY')
+                AND TO_DATE(v.data_date, 'YYYY') <= TO_DATE(%s, 'YYYY')
+                AND care_site.care_site_name = ANY(%s)
+        order by 1
+            """
     elif grouping_func == 'daily':
         date_trunc = 'day'
         date_format = 'YYYY-MM-DD'
