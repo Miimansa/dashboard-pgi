@@ -20,6 +20,7 @@ import Public from './pages/Home/Public_route';
 import { setTheme } from './pages/Home/themeUtils';
 import Forgetpassword from './pages/Home/Forgetpassword';
 import Procedure from './pages/Home/Procedure';
+import Atlascohort from './pages/Home/Atlascohort';
 function App() {
   const [deptList, setDeptlist] = useState();
   const dispatch = useDispatch();
@@ -59,6 +60,7 @@ function App() {
             <Route path="emergency" element={<Protect children={<Emergency />} />} />
             <Route path="disease" element={<Protect children={<Disease />} />} />
             <Route path="procedure" element={<Protect children={<Procedure />} />} />
+            <Route path="atlas" element={<Protect children={<Atlascohort />} />} />
             {/* <Route path="PatientExplorer" element={<Protect children={<Query />} />} /> */}
           </Route>
         </Routes>

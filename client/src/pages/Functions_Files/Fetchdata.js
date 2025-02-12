@@ -1,5 +1,5 @@
 import axios from "axios";
-import { get_lab_agg_url, get_emergency_agg_url, get_resources_agg_url, update_default_values, get_default_values, get_visit_url, get_discharge_type_url, homedata_url, get_dept_url, signup_url, opt_url, login_url, resend_opt_url, update_user_url, update_usertheme_url, validuser_url, labdata_url, resources_url, emergency_url, disease_url, get_test_type_url, request_pass_url, verify_request_url, changepass_url, newPassword_url, proceduredata_url, get_procedure_type_url, get_procedure_agg_url } from "./API";
+import { get_lab_agg_url, get_emergency_agg_url, get_resources_agg_url, update_default_values, get_default_values, get_visit_url, get_discharge_type_url, homedata_url, get_dept_url, signup_url, opt_url, login_url, resend_opt_url, update_user_url, update_usertheme_url, validuser_url, labdata_url, resources_url, emergency_url, disease_url, get_test_type_url, request_pass_url, verify_request_url, changepass_url, newPassword_url, proceduredata_url, get_procedure_type_url, get_procedure_agg_url, get_person_list_url } from "./API";
 
 // Function to get home data through axios
 const getdata_home = async (date_from, date_to, department_names, grouping_type, token) => {
@@ -406,4 +406,18 @@ const getprocedureData = async (date_from, date_to, departments, testTypes, fact
         console.error('Error in fetching lab data:', error);
     }
 };
-export { getprocedureData, getproceduretypes_test, getdata_procedure, getDischargeData, getLabData, getBloodGroupData, updateDefaultValues, getDefaultValues, getMultiData, getDischargeType, changePassword, requestVerify, requestResetPassword, gettypes_test, getdata_disease, getdata_emergency, getdata_resources, getdata_home, getDeptList, registerUser, verifyotp, resendOtp, loginUser, updateUser, updateUserTheme, validUser, getdata_lab, changeNewPassword }
+const getperson_list = async (limit, token) => {
+    const url = `${get_person_list_url}/?limit=${limit}`
+
+    try {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+        const response = await axios.get(url, { headers });
+        return response;
+    } catch (error) {
+        console.error('Error in fetching lab data:', error);
+    }
+};
+export { getperson_list, getprocedureData, getproceduretypes_test, getdata_procedure, getDischargeData, getLabData, getBloodGroupData, updateDefaultValues, getDefaultValues, getMultiData, getDischargeType, changePassword, requestVerify, requestResetPassword, gettypes_test, getdata_disease, getdata_emergency, getdata_resources, getdata_home, getDeptList, registerUser, verifyotp, resendOtp, loginUser, updateUser, updateUserTheme, validUser, getdata_lab, changeNewPassword }

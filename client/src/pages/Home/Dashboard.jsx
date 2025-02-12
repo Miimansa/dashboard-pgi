@@ -19,7 +19,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { ScaleLoader } from 'react-spinners';
 import MenuSimple from "./MU_dropdown";
 import { message } from "antd";
-
+import { HiMiniUserGroup } from "react-icons/hi2";
 const Dashboard = ({ Department_list }) => {
     const dispatch = useDispatch();
 
@@ -134,6 +134,7 @@ const Dashboard = ({ Department_list }) => {
             '/dashboard/labs',
             '/dashboard/procedure',
             '/dashboard/resources',
+            '/dashboard/atlas',
             '/dashboard/emergency',
             '/dashboard/disease',
             '/dashboard/PatientExplorer'
@@ -208,6 +209,12 @@ const Dashboard = ({ Department_list }) => {
                         <div className={`${Styles.items} ${active[2] && Styles.isactive}`} >
                             <BiSolidBellPlus />
                             <p className={`${hide && Styles.hide_onclick}`}>Procedure</p>
+                        </div>
+                    </Link>
+                    <Link to='atlas' className={Styles.links}>
+                        <div className={`${Styles.items} ${active[4] && Styles.isactive}`} >
+                            <HiMiniUserGroup />
+                            <p className={`${hide && Styles.hide_onclick}`} style={{ fontSize: "14px" }}>ATLAS COHORT</p>
                         </div>
                     </Link>
                     {/* <Link to='resources' className={Styles.links}>
