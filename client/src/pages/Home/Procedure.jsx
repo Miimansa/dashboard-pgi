@@ -4,13 +4,13 @@ import Styles from './Labs.module.css'
 import FlexiblePlotlyChart from "../Graphs/FlexibleChart";
 import { useDispatch, useSelector } from "react-redux";
 import { setloading_text } from "../../state/filtersSlice";
-import { getdata_lab, gettypes_test, updateDefaultValues, getDefaultValues } from "../Functions_Files/Fetchdata";
+import { updateDefaultValues, getDefaultValues, getproceduretypes_test, getdata_procedure } from "../Functions_Files/Fetchdata";
 import ClipLoader from "react-spinners/ClipLoader";
 import { formatDataForPieChart } from "../Functions_Files/file_functions";
 import { colourStyles } from "../Functions_Files/filters_data";
 import Select from 'react-select'
 import Switch from '@mui/material/Switch';
-import LabFactorSelector from "../Graphs/LabTypeAgg";
+import ProcedureFactorSelector from "../Graphs/ProcedureTypeAgg";
 import { message, Button, Select as AntSelect } from "antd";
 
 const { Option } = AntSelect;
@@ -35,7 +35,7 @@ const Procedure = () => {
 
     const currentTheme = useSelector((state) => state.graph.currentTheme);
     const [themeKey, setThemeKey] = useState(0);
-    const Userselection = useSelector((state) => state.user.user);
+    const Userselection = useSelector((state) => state.user.user); // taking same as lab from user configs needs to change later becasue that is same as lab section
     const from_date = useSelector((state) => state.filter.from_date || '').replace(/\//g, '-');
     const to_date = useSelector((state) => state.filter.to_date || '').replace(/\//g, '-');
     const group = useSelector((state) => state.filter.group);
@@ -52,8 +52,8 @@ const Procedure = () => {
 
     const handleChange = (e) => {
         setChecked(e.target.checked);
-        if (e.target.checked) message.info("Department wise lab patient count")
-        else message.info("Lab Count Aggregator")
+        if (e.target.checked) message.info("Department wise procedure count")
+        else message.info("Procedure count Aggregator")
     };
 
     const setSessionLabTypes = (types) => {
@@ -98,8 +98,8 @@ const Procedure = () => {
                 currentTypeString = await loadDefaultValues();
                 settype_string(currentTypeString);
             }
-            const res = await getdata_lab(from_date, to_date, department, group, token, currentTypeString);
-            const res_type = await gettypes_test(token);
+            const res = await getdata_procedure(from_date, to_date, department, group, token, currentTypeString);
+            const res_type = await getproceduretypes_test(token);
             changetypeformat(res_type.data);
             setdata(res.data)
             setloading(false)
@@ -197,8 +197,8 @@ const Procedure = () => {
                         selectedChart === "chart1" ? (
                             <FlexiblePlotlyChart
                                 key={`chart-${themeKey}`}
-                                data={data?.lab_order_count}
-                                chartTitle="Lab order count"
+                                data={data?.procedure_order_count}
+                                chartTitle="Procedure count"
                                 xAxisTitle="Time"
                                 yAxisTitle="Count"
                                 chartType={Userselection?.bio?.labs?.LabOrderCount?.SelectedType}
@@ -206,8 +206,8 @@ const Procedure = () => {
                         ) : selectedChart === "chart2" ? (
                             <FlexiblePlotlyChart
                                 key={`chart-${themeKey}`}
-                                data={data?.lab_orders_by_department}
-                                chartTitle="Department wise lab orders count"
+                                data={data?.procedure_orders_by_department}
+                                chartTitle="Department wise procedure count"
                                 xAxisTitle="Time"
                                 yAxisTitle="Count"
                                 chartType={Userselection?.bio?.labs?.labOrdersByDepartment?.SelectedType}
@@ -230,7 +230,7 @@ const Procedure = () => {
                                     <button onClick={handleSetDefault}>Set</button>
                                 </div>
                                 <FlexiblePlotlyChart
-                                    data={data?.monthly_lab_test_counts}
+                                    data={data?.monthly_procedure_test_counts}
                                     key={`chart-${themeKey}`}
                                     chartTitle="Lab Test types count"
                                     xAxisTitle="Time"
@@ -240,7 +240,7 @@ const Procedure = () => {
                             </>
                         ) : selectedChart === "chart4" ? (
 
-                            <LabFactorSelector testTypes={typetest.map(item => item.label)} />
+                            <ProcedureFactorSelector testTypes={typetest.map(item => item.label)} />
                         ) : null
                     ) : (
                         <>
@@ -248,8 +248,8 @@ const Procedure = () => {
                                 <div className={Styles.down_upchild}>
                                     <FlexiblePlotlyChart
                                         key={`chart-${themeKey}`}
-                                        data={data?.lab_order_count}
-                                        chartTitle="Lab order count"
+                                        data={data?.procedure_order_count}
+                                        chartTitle="Procedure count"
                                         xAxisTitle="Time"
                                         yAxisTitle="Count"
                                         chartType={Userselection?.bio?.labs?.LabOrderCount?.SelectedType}
@@ -258,8 +258,8 @@ const Procedure = () => {
                                 <div className={Styles.down_upchild}>
                                     <FlexiblePlotlyChart
                                         key={`chart-${themeKey}`}
-                                        data={data?.lab_orders_by_department}
-                                        chartTitle="Department wise lab orders count"
+                                        data={data?.procedure_orders_by_department}
+                                        chartTitle="Department wise procedure count"
                                         xAxisTitle="Time"
                                         yAxisTitle="Count"
                                         chartType={Userselection?.bio?.labs?.labOrdersByDepartment?.SelectedType}
@@ -285,9 +285,9 @@ const Procedure = () => {
 
                                 <div className={Styles.down_downchild1}>
                                     <FlexiblePlotlyChart
-                                        data={data?.monthly_lab_test_counts}
+                                        data={data?.monthly_procedure_test_counts}
                                         key={`chart-${themeKey}`}
-                                        chartTitle="Lab Test types count"
+                                        chartTitle="Procedure types count"
                                         xAxisTitle="Time"
                                         yAxisTitle="Count"
                                         chartType={Userselection?.bio?.labs?.monthlyLabTestCounts?.SelectedType}
@@ -302,11 +302,11 @@ const Procedure = () => {
                                     <>
                                         {checked ?
 
-                                            <LabFactorSelector testTypes={typetest.map(item => item.label)} />
+                                            <ProcedureFactorSelector testTypes={typetest.map(item => item.label)} />
                                             :
                                             <FlexiblePlotlyChart
                                                 data={formatDataForPieChart(data?.patient_count_by_total_department)}
-                                                chartTitle={"Department wise lab orders"}
+                                                chartTitle={"Department wise procedure"}
                                                 chartType={Userselection?.bio?.labs?.patientCountByDepartment?.SelectedType}
                                                 key={`chart-${themeKey}`}
                                             />

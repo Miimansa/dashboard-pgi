@@ -23,6 +23,6 @@ export const get_lab_agg_url = process.env.REACT_APP_BACKEND_URL + 'lab/lab-agg'
 export const get_emergency_agg_url = process.env.REACT_APP_BACKEND_URL + 'emergency/emergency-agg'
 export const update_default_values = process.env.REACT_APP_BACKEND_URL + 'auth/update-default-values'
 export const get_default_values = process.env.REACT_APP_BACKEND_URL + 'auth/get-default-values'
-
-
-
+export const proceduredata_url = process.env.REACT_APP_BACKEND_URL + 'procedure/'
+export const get_procedure_type_url = process.env.REACT_APP_BACKEND_URL + 'procedure/get_type'
+export const get_procedure_agg_url = process.env.REACT_APP_BACKEND_URL + 'procedure/procedure-agg'
