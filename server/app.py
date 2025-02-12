@@ -29,7 +29,8 @@ def create_app():
     from routes.emergency_routes import emergency_bp
     from routes.disease_routes import disease_bp
     from routes.auth_routes import auth_bp
-
+    from routes.procedure_routes import procedure_bp
+    
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     app.register_blueprint(home_bp, url_prefix='/home')
     app.register_blueprint(lab_bp, url_prefix='/lab')
@@ -37,6 +38,7 @@ def create_app():
     app.register_blueprint(emergency_bp, url_prefix='/emergency')
     app.register_blueprint(disease_bp, url_prefix='/disease')
     app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint (procedure_bp,url_prefix='/procedure')
 
     return app
 

@@ -1,14 +1,14 @@
 from flask import Blueprint, jsonify, request
-from services.lab_service import LabService
+from services.procedure_service import ProcedureService
 from flask_jwt_extended import jwt_required
 from flask_cors import CORS, cross_origin
-from SQL_Data.fetch_lab_data import fetch_lab_data_1,fetch_lab_data_2,fetch_lab_data_3
+from SQL_Data.fetch_procedure_data import fetch_procedure_data_1,fetch_procedure_data_2,fetch_procedure_data_3
 from datetime import datetime
 import json
 import pandas as pd
 
 
-def get_patient_count_by_department_labtests(df,grouping_type,factor):
+def get_patient_count_by_department_proceduretests(df,grouping_type,factor):
     if df.empty:
         return json.dumps({"message": "No data available"}, indent=2)
 
@@ -18,27 +18,27 @@ def get_patient_count_by_department_labtests(df,grouping_type,factor):
             df['Date'] = pd.to_datetime(df['Date'], format='%Y')
     # Group by Type and sum the Count
     print(df)
-    grouped = df.groupby(factor)['Lab Record Count'].sum().reset_index()
+    grouped = df.groupby(factor)['procedure Record Count'].sum().reset_index()
     
     # Sort by Count in descending order
-    grouped = grouped.sort_values('Lab Record Count', ascending=False)
+    grouped = grouped.sort_values('procedure Record Count', ascending=False)
     print(grouped)
     result = [
-            {"name": row[factor], "value": int(row['Lab Record Count'])}
+            {"name": row[factor], "value": int(row['procedure Record Count'])}
             for _, row in df.iterrows()
         ]
-
-
     return result
-lab_bp = Blueprint('lab', __name__)
 
-@lab_bp.route('/', methods=['GET'])
+
+procedure_bp = Blueprint('procedure', __name__)
+
+@procedure_bp.route('/', methods=['GET'])
 # @jwt_required()
-def lab():
+def procedure():
     # Get parameters from request
     date_from = request.args.get('date_from')
     date_to = request.args.get('date_to')
-    lab_type= request.args.get('type')
+    procedure_type= request.args.get('type')
     date_from = datetime.strptime(date_from, '%m-%d-%Y')
     date_to = datetime.strptime(date_to, '%m-%d-%Y')
     department_names = request.args.get('department_names', '').split(',')
@@ -53,18 +53,18 @@ def lab():
     elif(grouping_type=='yearly'):
         date_from=date_from.strftime('%Y')
         date_to=date_to.strftime('%Y')
-    lab_data_1=fetch_lab_data_1(date_from, date_to, department_names, grouping_type,lab_type)
-    lab_data_2=fetch_lab_data_2(date_from, date_to, department_names, grouping_type)
-    lab_data_3=fetch_lab_data_3(date_from, date_to, department_names, grouping_type)
-    # Initialize the service (assuming similar logic to fetch lab data)
-    print(f"Labdata1 { lab_data_1}")
+    procedure_data_1=fetch_procedure_data_1(date_from, date_to, department_names, grouping_type,procedure_type)
+    procedure_data_2=fetch_procedure_data_2(date_from, date_to, department_names, grouping_type)
+    procedure_data_3=fetch_procedure_data_3(date_from, date_to, department_names, grouping_type)
+    # Initialize the service (assuming similar logic to fetch procedure data)
+    print(f"proceduredata1 { procedure_data_1}")
 
-    print(f"Labdata3 { lab_data_3}")
-    # print(lab_data_2)
-    lab_service = LabService(lab_data_1,lab_data_2,lab_data_3)
+    print(f"proceduredata3 { procedure_data_3}")
+    # print(procedure_data_2)
+    procedure_service = ProcedureService(procedure_data_1,procedure_data_2,procedure_data_3)
 
     # Get the data
-    data = lab_service.get_all_lab_data(date_from, date_to, department_names, grouping_type)
+    data = procedure_service.get_all_procedure_data(date_from, date_to, department_names, grouping_type)
 
     return jsonify(data) 
 import psycopg2
@@ -76,7 +76,10 @@ db_params = {
         'password': Config.DB_PASSWORD,
         'host': Config.DB_HOST
     }
-@lab_bp.route('/get_type', methods=['GET'])
+
+
+
+@procedure_bp.route('/get_type', methods=['GET'])
 # @jwt_required()
 def get_type():
 
@@ -85,30 +88,31 @@ def get_type():
         conn = psycopg2.connect(**db_params)
         cur = conn.cursor()
         query = """
-    select distinct lab_service_name from
+    select distinct procedure_name from
         (
-            select to_char(m.measurement_date, 'YYYY-MM') AS data_month,
+            select to_char(p.procedure_date, 'YYYY-MM') AS data_month,
             COALESCE(v.care_site_id, 24473) AS department,
-            c.concept_id as lab_service_id,
-            c.concept_name as lab_service_name,
-            count(*) as lr_count from 
-            measurements as m inner join visit_occurrence as v
-            on m.visit_occurrence_id = v.visit_occurrence_id
+            c.concept_id as procedure_id,
+            c.concept_name as procedure_name,
+            count(*) as pr_count from 
+            procedure_occurrence as p inner join visit_occurrence as v
+            on COALESCE(p.visit_occurrence_id, 404644) = v.visit_occurrence_id
             inner join concept as c
-            on m.measurement_concept_id = c.concept_id 
-            group by data_month,department,lab_service_id,lab_service_name
-            ORDER BY lr_count DESC
+            on p.procedure_concept_id = c.concept_id 
+            group by data_month,department,procedure_id,procedure_name
+            ORDER BY pr_count DESC
         ) as subquery
+        limit 5
 """
         cur.execute(query)
         rows = cur.fetchall()
         
         # Converting the fetched data into a list of strings
-        lab_names = [row[0] for row in rows]
+        procedure_names = [row[0] for row in rows]
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        lab_names = []
+        procedure_names = []
         
     finally:
         if cur:
@@ -116,15 +120,16 @@ def get_type():
         if conn:
             conn.close()
 
-    return lab_names
+    return procedure_names
 
-@lab_bp.route('/lab-agg/', methods=['GET'])
+
+@procedure_bp.route('/procedure-agg/', methods=['GET'])
 # @jwt_required()
-def lab_agg():
+def procedure_agg():
     # Get parameters from request
     date_from = request.args.get('date_from')
     date_to = request.args.get('date_to')
-    lab_type= request.args.get('type')
+    procedure_type= request.args.get('type')
     date_from = datetime.strptime(date_from, '%m-%d-%Y')
     date_to = datetime.strptime(date_to, '%m-%d-%Y')
     department_names = request.args.get('department_names', '').split(',')
@@ -140,13 +145,13 @@ def lab_agg():
     elif(grouping_type=='yearly'):
         date_from=date_from.strftime('%Y')
         date_to=date_to.strftime('%Y')
-    lab_data_1=fetch_lab_data_1(date_from, date_to, department_names, grouping_type,lab_type)
-    # Initialize the service (assuming similar logic to fetch lab data)
-    print(f"Labdata1 { lab_data_1}")
+    procedure_data_1=fetch_procedure_data_1(date_from, date_to, department_names, grouping_type,procedure_type)
+    # Initialize the service (assuming similar logic to fetch procedure data)
+    print(f"proceduredata1 { procedure_data_1}")
 
 
 
     # Get the data
-    data = get_patient_count_by_department_labtests(lab_data_1, grouping_type,factor)
+    data = get_patient_count_by_department_proceduretests(procedure_data_1, grouping_type,factor)
 
     return jsonify(data) 

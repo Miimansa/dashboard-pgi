@@ -132,6 +132,7 @@ const Dashboard = ({ Department_list }) => {
         const paths = [
             '/dashboard',
             '/dashboard/labs',
+            '/dashboard/procedure',
             '/dashboard/resources',
             '/dashboard/emergency',
             '/dashboard/disease',
@@ -203,7 +204,13 @@ const Dashboard = ({ Department_list }) => {
                             <p className={`${hide && Styles.hide_onclick}`}>Labs</p>
                         </div>
                     </Link>
-                    <Link to='resources' className={Styles.links}>
+                    <Link to='procedure' className={Styles.links}>
+                        <div className={`${Styles.items} ${active[2] && Styles.isactive}`} >
+                            <BiSolidBellPlus />
+                            <p className={`${hide && Styles.hide_onclick}`}>Procedure</p>
+                        </div>
+                    </Link>
+                    {/* <Link to='resources' className={Styles.links}>
                         <div className={`${Styles.items} ${active[2] && Styles.isactive}`} >
                             <FaTools />
                             <p className={`${hide && Styles.hide_onclick}`}>Resources</p>
@@ -214,7 +221,7 @@ const Dashboard = ({ Department_list }) => {
                             <BiSolidBellPlus />
                             <p className={`${hide && Styles.hide_onclick}`}>Admissions</p>
                         </div>
-                    </Link>
+                    </Link> */}
                     {/* <Link to='disease' className={Styles.links}>
                         <div className={`${Styles.items} ${active[4] && Styles.isactive}`} >
                             <IoBody />
@@ -222,16 +229,17 @@ const Dashboard = ({ Department_list }) => {
                         </div>
                     </Link> */}
                     {/* <Link to='PatientExplorer' className={Styles.links}> */}
-                    <div
+                    {/* <div
                         className={`${Styles.items_query}`}>
                         <BsPatchQuestionFill />
                         <p style={{ fontSize: '15px' }} className={`${hide && Styles.hide_onclick}`}>Disease</p>
-                    </div>
+                    </div> 
                     <div
                         className={`${Styles.items_query}`}>
                         <BsPatchQuestionFill />
                         <p style={{ fontSize: '15px' }} className={`${hide && Styles.hide_onclick}`}>Patient Explorer</p>
-                    </div>
+                    </div> */}
+
                     {/* </Link> */}
                     <div className={Styles.poweredbydiv}>
                         <p>Powered By</p>

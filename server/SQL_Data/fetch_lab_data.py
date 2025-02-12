@@ -99,7 +99,7 @@ def fetch_lab_data_1(start_date, end_date, dept_names, grouping_func, lab_type):
         cur = conn.cursor()
         print(f"Executed query:")
         dept_names = [dept.strip() for dept in dept_names]
-        print("###############################################")
+        print("data1###############################################")
         print(cur.mogrify(query, (lab_services, start_date, end_date, dept_names)).decode('utf-8'))
         print("###############################################")
         cur.execute(query, (lab_services, start_date, end_date, dept_names))
@@ -140,8 +140,9 @@ def fetch_lab_data_2(start_date, end_date, dept_names, grouping_func):
             INNER JOIN care_site AS c 
             ON c.care_site_id = COALESCE(v.care_site_id, 24473)
             WHERE v.visit_concept_id IN (9203, 32217)
-            AND TO_DATE(m.measurement_date, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')
-            AND TO_DATE(m.measurement_date, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
+            AND TO_DATE(TO_CHAR(m.measurement_date, 'YYYY-MM'), 'YYYY-MM') >= TO_DATE(%s ,'MM-YYYY')  
+            AND TO_DATE(TO_CHAR(m.measurement_date, 'YYYY-MM'), 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')  
+            AND c.care_site_name = ANY(%s)
             GROUP BY m.measurement_date, c.care_site_name, type
           """
     elif grouping_func == 'weekly':
@@ -164,6 +165,7 @@ def fetch_lab_data_2(start_date, end_date, dept_names, grouping_func):
             WHERE v.visit_concept_id IN (9203, 32217) 
             AND m.measurement_date >=  %s
             AND m.measurement_date <=  %s
+            AND c.care_site_name = ANY(%s)
             GROUP BY m.measurement_date, c.care_site_name, type 
           """
     elif grouping_func == 'yearly':
@@ -184,8 +186,9 @@ def fetch_lab_data_2(start_date, end_date, dept_names, grouping_func):
             INNER JOIN care_site AS c 
             ON c.care_site_id = COALESCE(v.care_site_id, 24473)
             WHERE v.visit_concept_id IN (9203, 32217) 
-            AND TO_DATE(m.measurement_date, 'YYYY') >= TO_DATE(%s, 'YYYY')
-            AND TO_DATE(m.measurement_date, 'YYYY') <= TO_DATE(%s, 'YYYY')
+            AND TO_DATE(TO_CHAR(m.measurement_date, 'YYYY'), 'YYYY') >= TO_DATE(%s ,'YYYY')  
+            AND TO_DATE(TO_CHAR(m.measurement_date, 'YYYY'), 'YYYY') <= TO_DATE(%s, 'YYYY')  
+            AND c.care_site_name = ANY(%s)
             GROUP BY m.measurement_date, c.care_site_name, type
           """
     elif grouping_func == 'daily':
@@ -203,8 +206,10 @@ def fetch_lab_data_2(start_date, end_date, dept_names, grouping_func):
         cur = conn.cursor()
         print(f"Executed query:")
         dept_names = [dept.lstrip() for dept in dept_names]
-        print(cur.mogrify(query, (start_date, end_date, tuple(dept_names))).decode('utf-8'))
-        cur.execute(query, (start_date, end_date, tuple(dept_names)))
+        print("data2###############################################")
+        print(cur.mogrify(query, (start_date, end_date, dept_names)).decode('utf-8'))
+        print("###############################################")
+        cur.execute(query, (start_date, end_date, dept_names))
         rows = cur.fetchall()
         
         lab_data_2 = pd.DataFrame(rows, columns=['Date', 'DepartmentName','Type', 'Count'])
@@ -240,8 +245,9 @@ def fetch_lab_data_3(start_date, end_date, dept_names, grouping_func):
                 ORDER BY data_month
             ) AS subquery
             INNER JOIN care_site ON subquery.department = care_site.care_site_id 
-            AND TO_DATE(subquery.data_month, 'YYYY-MM') >= TO_DATE(%s, 'MM-YYYY')
-            AND TO_DATE(subquery.data_month, 'YYYY-MM') <= TO_DATE(%s, 'MM-YYYY')
+            AND TO_DATE(subquery.data_month, 'YYYY-MM')>= TO_DATE(%s ,'MM-YYYY')  
+            AND TO_DATE(subquery.data_month, 'YYYY-MM') <= TO_DATE(%s,'MM-YYYY')  
+
             AND care_site.care_site_name = ANY(%s)
             ORDER BY subquery.data_month, care_site.care_site_name, subquery.lr_count DESC;
         """
@@ -264,8 +270,8 @@ def fetch_lab_data_3(start_date, end_date, dept_names, grouping_func):
                 ORDER BY data_month
             ) AS subquery
             INNER JOIN care_site ON subquery.department = care_site.care_site_id 
-            AND TO_DATE(subquery.data_month, 'YYYY') >= TO_DATE(%s, 'YYYY')
-            AND TO_DATE(subquery.data_month, 'YYYY') <= TO_DATE(%s, 'YYYY')
+AND TO_DATE(subquery.data_month, 'YYYY') >= TO_DATE(%s ,'YYYY')  
+AND TO_DATE(subquery.data_month, 'YYYY')<= TO_DATE(%s, 'YYYY')  
             AND care_site.care_site_name = ANY(%s)
             ORDER BY subquery.data_month, care_site.care_site_name, subquery.lr_count DESC;
         """
@@ -302,7 +308,9 @@ def fetch_lab_data_3(start_date, end_date, dept_names, grouping_func):
         cur = conn.cursor()
         print(f"Executed query:")
         dept_names = [dept.strip() for dept in dept_names]
+        print("data3###############################################")
         print(cur.mogrify(query, (start_date, end_date, dept_names)).decode('utf-8'))
+        print("###############################################")
         cur.execute(query, ( start_date, end_date, dept_names))
         rows = cur.fetchall()
         lab_data_1 = pd.DataFrame(rows, columns=['Date', 'DepartmentName', 'Lab Record Name', 'Lab Record Count'])
