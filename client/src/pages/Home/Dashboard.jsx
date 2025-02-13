@@ -20,6 +20,8 @@ import { ScaleLoader } from 'react-spinners';
 import MenuSimple from "./MU_dropdown";
 import { message } from "antd";
 import { HiMiniUserGroup } from "react-icons/hi2";
+import { LiaCapsulesSolid } from "react-icons/lia";
+import { MdMedicalServices } from "react-icons/md";
 const Dashboard = ({ Department_list }) => {
     const dispatch = useDispatch();
 
@@ -133,8 +135,9 @@ const Dashboard = ({ Department_list }) => {
             '/dashboard',
             '/dashboard/labs',
             '/dashboard/procedure',
-            '/dashboard/resources',
+            '/dashboard/drug',
             '/dashboard/atlas',
+            '/dashboard/resources',
             '/dashboard/emergency',
             '/dashboard/disease',
             '/dashboard/PatientExplorer'
@@ -207,8 +210,14 @@ const Dashboard = ({ Department_list }) => {
                     </Link>
                     <Link to='procedure' className={Styles.links}>
                         <div className={`${Styles.items} ${active[2] && Styles.isactive}`} >
-                            <BiSolidBellPlus />
+                            <MdMedicalServices />
                             <p className={`${hide && Styles.hide_onclick}`}>Procedure</p>
+                        </div>
+                    </Link>
+                    <Link to='drug' className={Styles.links}>
+                        <div className={`${Styles.items} ${active[3] && Styles.isactive}`} >
+                            <LiaCapsulesSolid />
+                            <p className={`${hide && Styles.hide_onclick}`}>Drugs</p>
                         </div>
                     </Link>
                     <Link to='atlas' className={Styles.links}>

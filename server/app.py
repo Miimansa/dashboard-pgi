@@ -31,6 +31,7 @@ def create_app():
     from routes.auth_routes import auth_bp
     from routes.procedure_routes import procedure_bp
     from routes.atlascohort_routes import atlas_bp
+    from routes.drug_routes import drug_bp 
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     app.register_blueprint(home_bp, url_prefix='/home')
     app.register_blueprint(lab_bp, url_prefix='/lab')
@@ -40,6 +41,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint (procedure_bp,url_prefix='/procedure')
     app.register_blueprint (atlas_bp,url_prefix='/atlas')
+    app.register_blueprint (drug_bp,url_prefix='/drug')
 
     return app
 

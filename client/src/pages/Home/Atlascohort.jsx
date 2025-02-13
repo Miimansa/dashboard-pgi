@@ -3,6 +3,9 @@ import { useSelector } from "react-redux";
 import { getperson_list } from "../Functions_Files/Fetchdata";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import Papa from "papaparse";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const Atlascohort = () => {
     const [personData, setPersonData] = useState(null);
@@ -10,11 +13,7 @@ const Atlascohort = () => {
     const [loading, setLoading] = useState(false);
     const token = useSelector((state) => state.user.token);
 
-    useEffect(() => {
-        fetchData(limit);
-    }, [limit]);
-
-    const fetchData = async (limit) => {
+    const fetchData = async () => {
         setLoading(true);
         const data = await getperson_list(limit, token);
         if (data.data && data.data.persondata) {
@@ -23,30 +22,50 @@ const Atlascohort = () => {
         setLoading(false);
     };
 
-    const exportToExcel = () => {
+    const exportToExcel = (dataArray) => {
         if (!personData) return;
-
+        const worksheet = XLSX.utils.json_to_sheet(dataArray);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Person Data");
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+        saveAs(data, "PersonData.xlsx");
+    };
+    const exportTocsv = (dataArray) => {
+        if (!personData) return;
+        const csv = Papa.unparse(dataArray);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        saveAs(blob, "person_data.csv");
+    };
+    const exportPDF = (dataArray) => {
+        if (!personData) return;
+        const doc = new jsPDF();
+        doc.text("Person Data", 14, 10);
+        const tableColumn = ["Sr.", "Person ID", "Year of Birth", "Age", "Gender", "MRN"];
+        const tableRows = dataArray.map(obj => Object.values(obj));
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+        });
+        doc.save("person_data.pdf");
+    };
+    const downloadData = (e) => {
+        const data = e.target.innerText
+        console.log(data)
         const dataArray = personData.person_id.map((id, index) => ({
             "Sr.": index + 1,
             "Person ID": id,
             "Year of Birth": personData.year_of_birth[index],
             "Age": personData.age[index],
             "Gender": personData.gender_source_value[index],
-            "Source Value": personData.person_source_value[index],
+            "MRN": personData.person_source_value[index],
         }));
+        if (data === 'Export to Pdf') exportPDF(dataArray);
+        else if (data === 'Export to Csv') exportTocsv(dataArray);
+        else if (data === 'Export to Excel') exportToExcel(dataArray);
 
-        const worksheet = XLSX.utils.json_to_sheet(dataArray);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Person Data");
-
-        // Create and trigger a download
-        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(data, "PersonData.xlsx");
-    };
-
-    const limitArray = [10, 20, 50, 100, 500, 1000];
-
+    }
     return (
         <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", width: "100%" }}>
             <h2 style={{ color: "white", backgroundColor: "black", padding: "10px", borderRadius: "5px", textAlign: "center", fontSize: "24px", fontWeight: "bold", marginBottom: "10px" }}>
@@ -56,32 +75,78 @@ const Atlascohort = () => {
             {/* Controls */}
             <div style={{ marginBottom: "10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                    <label style={{ fontWeight: "bold", marginRight: "10px" }}>Select Limit:</label>
-                    <select
+                    <label style={{ fontWeight: "bold", marginRight: "10px" }}>Select Rows:</label>
+                    <input
                         style={{ padding: "8px", border: "2px solid #000000", borderRadius: "5px", cursor: "pointer", backgroundColor: "white" }}
                         value={limit}
                         onChange={(e) => setLimit(Number(e.target.value))}
+                        type="text"
                     >
-                        {limitArray.map((num) => (
-                            <option key={num} value={num}>{num}</option>
-                        ))}
-                    </select>
+                    </input>
+                    <button
+                        onClick={fetchData}
+                        style={{
+                            padding: "8px 12px",
+                            backgroundColor: "#28a745",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                            marginLeft: "20px"
+                        }}
+                        disabled={loading}
+
+                    >
+                        Retrieve
+                    </button>
                 </div>
-                <button
-                    onClick={exportToExcel}
-                    style={{
-                        padding: "8px 12px",
-                        backgroundColor: "#28a745",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                        fontWeight: "bold"
-                    }}
-                    disabled={!personData}
+                <div style={{ display: 'flex', gap: "20px" }}
+                    onClick={(e) => downloadData(e)}
                 >
-                    Export to Excel
-                </button>
+                    <button
+                        style={{
+                            padding: "8px 12px",
+                            backgroundColor: "#28a745",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            fontWeight: "bold"
+                        }}
+                        disabled={!personData}
+                    >
+                        Export to Excel
+                    </button>
+                    <button
+                        style={{
+                            padding: "8px 12px",
+                            backgroundColor: "#28a745",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            fontWeight: "bold"
+                        }}
+                        disabled={!personData}
+                    >
+                        Export to Csv
+                    </button>
+                    <button
+                        style={{
+                            padding: "8px 12px",
+                            backgroundColor: "#28a745",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            fontWeight: "bold"
+                        }}
+                        disabled={!personData}
+                    >
+                        Export to Pdf
+                    </button>
+                </div>
             </div>
 
             {loading ? (
@@ -96,7 +161,7 @@ const Atlascohort = () => {
                                 <th style={{ padding: "10px", border: "1px solid #ddd" }}>Year of Birth</th>
                                 <th style={{ padding: "10px", border: "1px solid #ddd" }}>Age</th>
                                 <th style={{ padding: "10px", border: "1px solid #ddd" }}>Gender</th>
-                                <th style={{ padding: "10px", border: "1px solid #ddd" }}>Source Value</th>
+                                <th style={{ padding: "10px", border: "1px solid #ddd" }}>MRN</th>
                             </tr>
                         </thead>
                         <tbody>

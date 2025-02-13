@@ -27,3 +27,6 @@ export const proceduredata_url = process.env.REACT_APP_BACKEND_URL + 'procedure/
 export const get_procedure_type_url = process.env.REACT_APP_BACKEND_URL + 'procedure/get_type'
 export const get_procedure_agg_url = process.env.REACT_APP_BACKEND_URL + 'procedure/procedure-agg'
 export const get_person_list_url = process.env.REACT_APP_BACKEND_URL + 'atlas'
+export const drugdata_url = process.env.REACT_APP_BACKEND_URL + 'drug/'
+export const get_drug_type_url = process.env.REACT_APP_BACKEND_URL + 'drug/get_type'
+export const get_drug_agg_url = process.env.REACT_APP_BACKEND_URL + 'drug/drug-agg'
